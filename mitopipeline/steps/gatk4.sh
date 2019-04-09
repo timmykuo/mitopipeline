@@ -10,21 +10,23 @@
 #### $4 - mtDNA Copy Number (used in GATK) use 100 if you can't find it on gdc portal
 ################
 
+#$1 is filename
+#$2 is start directory
+#$3 is out directory
 module load intel/17
 module load openmpi/2.0.1
 module load samtools
-STOR="/mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/gatk_stor"
-VCFS="/mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/gatk_vcfs"
-PILEUPS="/mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/pileups"
+TMPDIR=$3"/temp"
+BAMS=$2"/no_numts_bams"
 #### $2 is the OUT DIR where you want the final.vcf file to be saved.
-
 
 cd /mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/no_numts_bams
 echo *****AddOrReplaceReadGroups $1*****
-java -Xmx8g -jar /home/sxg501/Tools/picard-tools-1.93/AddOrReplaceReadGroups.jar \
-I=$1.mito_hg38.sorted.mt.bam \
-O=$STOR/$1.tcga.sort.2.bam \
+java -Xmx8g -jar ./tools/picard-tools-1.93/AddOrReplaceReadGroups.jar \
+I=$BAMS/$1.mito_hg38.sorted.mt.bam \
+O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
+
 RGID=TLL \
 RGLB=bar \
 RGPL=illumina \
@@ -34,53 +36,52 @@ VALIDATION_STRINGENCY=SILENT
 echo *****done*****
 
 echo *****Picard Mark Duplicates and RealignerTargetCreator $1*****
-touch $STOR/$1.metricsfile.txt
+touch $TMPDIR/$1.metricsfile.txt
 
-java -Xmx8g -jar /home/sxg501/Tools/picard-tools-1.93/MarkDuplicates.jar \
-INPUT=$STOR/$1.tcga.sort.2.bam \
-OUTPUT=$STOR/$1.tcga.marked.bam \
-METRICS_FILE=$STOR/$1.metricsfile.txt \
+java -Xmx8g -jar ./tools/picard-tools-1.93/MarkDuplicates.jar \
+INPUT=$TMPDIR/$1.tcga.sort.2.bam \
+OUTPUT=$TMPDIR/$1.tcga.marked.bam \
+METRICS_FILE=$TMPDIR/$1.metricsfile.txt \
 CREATE_INDEX=true \
 
-java -Xmx8g -jar /home/sxg501/Tools/picard-tools-1.93/FixMateInformation.jar \
-INPUT=$STOR/$1.tcga.marked.bam \
-OUTPUT=$STOR/$1.tcga.marked.realigned.fixed.bam \
+java -Xmx8g -jar ./tools/picard-tools-1.93/FixMateInformation.jar \
+INPUT=$TMPDIR/$1.tcga.marked.bam \
+OUTPUT=$TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 SO=coordinate \
 VALIDATION_STRINGENCY=SILENT \
 CREATE_INDEX=true
 echo *****done*****
 
 echo *****BaseRecalibrator $1*****
-/mnt/rds/txl80/LaframboiseLab/tyk3/Tools/gatk-4.0.11.0/gatk --java-options "-Xmx8g" BaseRecalibrator \
--I $STOR/$1.tcga.marked.realigned.fixed.bam \
+./tools/gatk-4.0.11.0/gatk --java-options "-Xmx8g" BaseRecalibrator \
+-I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa \
--O $STOR/$1.recal_data.grp \
+-O $TMPDIR/$1.recal_data.grp \
 --known-sites /home/tyk3/GATK-ReAnalyze/dbsnp/mtONLY.vcf 
 echo *****done*****
 
 echo *****PrintReads $1*****
-/mnt/rds/txl80/LaframboiseLab/tyk3/Tools/gatk-4.0.11.0/gatk --java-options "-Xmx8g" ApplyBQSR \
+./tools/gatk-4.0.11.0/gatk --java-options "-Xmx8g" ApplyBQSR \
 -R /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa \
--I $STOR/$1.tcga.marked.realigned.fixed.bam \
--bqsr-recal-file $STOR/$1.recal_data.grp \
--O $STOR/$1.tcga.marked.realigned.fixed.read.bam
+-I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
+-bqsr-recal-file $TMPDIR/$1.recal_data.grp \
+-O $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam
 echo *****done*****
 
 echo *****HaplotypeCaller $1*****
-/mnt/rds/txl80/LaframboiseLab/tyk3/Tools/gatk-4.0.11.0/gatk --java-options "-Xmx10g" HaplotypeCaller \
+./gatk-4.0.11.0/gatk --java-options "-Xmx10g" HaplotypeCaller \
 -R /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa \
--I $STOR/$1.tcga.marked.realigned.fixed.read.bam \
+-I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
 --max-reads-per-alignment-start 200 \
 --sample-ploidy 100 \
 --pcr-indel-model HOSTILE \
--O $STOR/$1.tcga.snps.vcf \
+-O $TMPDIR/$1.tcga.snps.vcf \
 --min-pruning 10 \
 -A DepthPerAlleleBySample \
 --dbsnp /home/tyk3/GATK-ReAnalyze/dbsnp/mtONLY.vcf \
 -DF NotDuplicateReadFilter \
 --minimum-mapping-quality 0 
 
-samtools mpileup -f /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa $STOR/$1.tcga.marked.realigned.fixed.read.bam > $PILEUPS/$1.pileup
 #echo *****Starting DepthOfCoverage*****
 #java -Xmx64g -jar /homeG/LaFramboiseLab/sjm67/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar  \
 #-R /homeG/LaFramboiseLab/sjm67/TCGA/hg19_karyo_rCRS/hg19_karyo_rCRS-MT.fa \
@@ -91,10 +92,10 @@ samtools mpileup -f /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa 
 #echo *****done*****
 
 echo *****VariantFiltration $1******
-/mnt/rds/txl80/LaframboiseLab/tyk3/Tools/gatk-4.0.11.0/gatk --java-options "-Xmx8g" VariantFiltration \
--R /mnt/rds/txl80/LaframboiseLab/tyk3/REFs/MitoREFs/rCRS-MT.fa \
--V $STOR/$1.tcga.snps.vcf \
--O $VCFS/$1.snps.recalibrated.filtered.vcf \
+./gatk-4.0.11.0/gatk --java-options "-Xmx8g" VariantFiltration \
+-R ./REFs/MitoREFs/rCRS-MT.fa \
+-V $TMPDIR/$1.tcga.snps.vcf \
+-O $3/$1.snps.recalibrated.filtered.vcf \
 --filter-expression "QD < 2.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
 --filter-name "my_snp_filter" 
 

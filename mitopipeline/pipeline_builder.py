@@ -1,4 +1,4 @@
-import os, sys, ast, util, error
+import os, sys, ast, util, errors
 from template_builder import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template
 SLURM = 1
 NO_SLURM = 0
@@ -21,7 +21,7 @@ class PipelineBuilder():
                             'remove_numts': ['remove_numts.sh', 'submit_removenumts_job.sh'],
                             'downsample': ['downsample.sh', 'submit_downsample_job.sh'],
                             'gatk3': ['gatk3.sh', 'submit_gatk3_job.sh'],
-                            'gatk4': ['gatk4.sh', 'submit_gatk4_job.sh']
+                            'gatk4': ['gatk4.sh', 'submit_gatk4_job.sh'],
                             'snpeff': ['snpeff.sh', 'submit_snpeff_job.sh'],
                             'annovar': ['annovar.sh', 'submit_annovar_job.sh'],
                             'haplogrep': ['haplogrep.sh', 'submit_haplogrep_job.sh']}

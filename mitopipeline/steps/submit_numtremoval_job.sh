@@ -1,5 +1,8 @@
 #!/bin/bash
-if [ ! -f /mnt/rds/txl80/LaframboiseLab/tyk3/scripts/slurm/align_and_numt_removal_$1.slurm ];
+#$1 is filename
+#$2 is script name
+#$3 is OUT/slurm directory
+if [ ! -f $3/slurm/align_and_numt_removal_$1.slurm ];
 then
 FILE="/mnt/rds/txl80/LaframboiseLab/tyk3/scripts/slurm/align_and_numt_removal_$1.slurm"
 echo '#!/bin/bash' >> $FILE

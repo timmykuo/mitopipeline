@@ -16,6 +16,11 @@ def check_tools_exist(tools, steps, softwares):
 
 #creates subdirectories for all the requested steps within the specified output directory
 def make_subdirectories(output, steps):
+    subdirectories = {'remove_numts': ['fastqs', 'pileups', 'numt_removal_stor', 'counts']}
     for step in steps:
         if not os.path.isdir(output + "/" + step):
             os.makedirs(output + "/" + step)
+            for sub in subdirectories[step]:
+                os.makedirs(output + "/" + sub)
+    #make subdirectories for parts within each step
+
