@@ -1,10 +1,10 @@
-import os, sys, ast, util, errors
-from template_builder import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
+import os, sys, ast
+from util import check_tools_exist, check_file_format, make_subdirectories
+from templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
 
     def __init__(self):
-        #self.softwares = ['gatk3', 'gatk4', 'snpeff', 'annovar', 'haplogrep']
         self.softwares = ['gatk', 'snpeff', 'annovar', 'haplogrep']
         self.task_names = {'extract_mito': 'ExtractMito',
                             'split_gap': 'SplitGap',
@@ -21,8 +21,6 @@ class PipelineBuilder():
                             'remove_numts': ['remove_numts.sh'],
                             'downsample': ['downsample.sh'],
                             'gatk': ['gatk.sh'],
-                            #'gatk3': ['gatk3.sh', 'submit_gatk3_job.sh'],
-                            #'gatk4': ['gatk4.sh', 'submit_gatk4_job.sh'],
                             'snpeff': ['snpeff.sh'],
                             'annovar': ['annovar.sh'],
                             'haplogrep': ['haplogrep.sh']}
@@ -35,27 +33,26 @@ class PipelineBuilder():
         if not tools:
             raise ValueError('Pipeline builder requires a directory that contains all the software tools')
         else:
-            #errors.check_tools_exist(tools, steps, self.softwares)
+            check_tools_exist(tools, steps, self.softwares)
             self.build_from_template(directory, output, steps, slurm)
 
     def build_from_template(self, directory, output, steps, slurm):
-        #errors.check_file_format(directory)
-        #errors.make_subdirectories(output, steps)
+        check_file_format(directory)
+        make_subdirectories(output, steps)
         with open('pipeline.py', 'w+') as pipeline:
             pipeline.write(import_template.render(imports=['util', 'luigi', 'subprocess', 'os', 'shutil']))
             pipeline.write(paths_template.render(directory=directory, output=output) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=list(self.task_names[step] for step in steps if step in self.softwares)) + "\n")
             prev_step = ""
-            #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
-            if 'split_gap' in steps:
-                self.job_names['remove_numts'] = ['remove_numts_no_split_gap.sh']
-                #self.job_names['gatk3'] = ['gatk3_no_split_gap.sh', 'submit_gatk3_no_split_gap_job.sh']
-                #self.job_names['gatk4'] = ['gatk4_no_split_gap.sh', 'submit_gatk4_no_split_gap_job.sh']
-
+           
             #write in the steps requested into the pipeline
             for step in steps:
+                #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
+                if 'split_gap' in steps and step == 'remove_numts':
+                    job_name = 'remove_numts_no_split_gap.sh'
                 #step only is name of the step, not the name of the script
-                job_name = step + ".sh"
+                else:
+                    job_name = step + ".sh"
                 pipeline.write(self.get_template(slurm, prev_step, job_name, step))
                 if "gatk" in step or step not in self.softwares:
                     prev_step = self.task_names[step]
