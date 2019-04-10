@@ -18,7 +18,7 @@ def parse_commands(argv=sys.argv[1:]):
 
 def build_and_run(opts):
     pipeline_builder = PipelineBuilder()
-    pipeline_builder.build_pipeline(slurm=opts.slurm, directory=opts.directory, steps=remove_steps(opts.remove), output=opts.output)
+    pipeline_builder.build_pipeline(slurm=opts.slurm, tools=opts.tools, directory=opts.directory, steps=remove_steps(opts.remove), output=opts.output)
     #PipelineRunner.run('./pipeline.py', opts.workers)
     #if not opts.save:
     #    PipelineRunner.cleanup()

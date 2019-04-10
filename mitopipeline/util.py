@@ -1,10 +1,8 @@
 def parse_fid(f):
-    parsed = str(f).split("_")
-    cancer = parsed[0]
-    patient_id = parsed[1] + "_" + parsed[2]
-    return cancer + "_" + patient_id
-
-
-def get_name(f_id):
-    split = f_id.split("_")
-    return split[0] + "_" + split[1]
+    #if the file has been processed through at least one step in the pipeline
+    if "_" in f:
+        parsed = str(f).split("_")
+    #filename is FILENAME.bam i.e., hasn't been processed yet
+    else:
+        parsed = str(f).split(".")
+    return parsed[0]
