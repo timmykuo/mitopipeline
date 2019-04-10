@@ -1,6 +1,6 @@
-import os, sys, ast
-from util import check_tools_exist, check_file_format, make_subdirectories
-from templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
+import os, sys
+from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories
+from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
 

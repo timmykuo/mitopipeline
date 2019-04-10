@@ -1,3 +1,7 @@
 /mitopipeline/REFs/*
 /mitopipeline/_pycache_/*
 /dist/*
+/mitopipeline/__pycache__/*
+/bin/*
+/build/*
+/mitopipeline.egg-info/

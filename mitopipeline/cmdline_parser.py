@@ -1,6 +1,6 @@
 import argparse, sys, os
-from pipeline_builder import PipelineBuilder
-from pipeline_runner import PipelineRunner
+from mitopipeline.pipeline_builder import PipelineBuilder
+from mitopipeline.pipeline_runner import PipelineRunner
 class CommandLineParser():
 
     ALL_STEPS = ['extract_mito', 'split_gap', 'clipping', 'remove_numts', 'downsample',

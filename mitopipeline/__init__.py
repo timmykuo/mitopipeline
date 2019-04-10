@@ -1,1 +1,1 @@
-from mitopipeline.cmdline_parser.py import CommandLineParser
+from mitopipeline.cmdline_parser import CommandLineParser

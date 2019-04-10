@@ -1,15 +1,20 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name="mitopipeline",
-    version="0.1",
+    version="0.13",
     packages=['mitopipeline'],
+    py_modules=['mitopipeline'],
 
     #add samtools, bwa, etc. here
     install_requires=[
         'jinja2'
     ],
 
+    entry_points = '''
+        [console_scripts]
+        mitopipeline=mitopipeline.cmdline:run
+    ''',
     package_data={},
 
     #metadata
