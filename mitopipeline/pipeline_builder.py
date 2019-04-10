@@ -38,9 +38,9 @@ class PipelineBuilder():
 
     def build_from_template(self, directory, output, steps, slurm):
         check_file_format(directory)
-        make_subdirectories(output, steps)
+        make_subdirectories(output, steps, slurm)
         with open('pipeline.py', 'w+') as pipeline:
-            pipeline.write(import_template.render(imports=['util', 'luigi', 'subprocess', 'os', 'shutil']))
+            pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil']))
             pipeline.write(paths_template.render(directory=directory, output=output) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=list(self.task_names[step] for step in steps if step in self.softwares)) + "\n")
             prev_step = ""
