@@ -15,3 +15,5 @@ This tool should handle all dependency management in-between each step for the u
 - Provide built in steps such as alignment, clipping, removal of NuMTs, and splitting the gap for Complete Genomics vcf files
 - Use 3rd party software packages like GATK, ANNOVAR, SNPEFF, etc.
 - Accurately log successes and failures that occurred while running the pipeline
+### Acknowledgements
+Many of the steps in the pipeline were adapted from scripts written by Sneha Grandhi
