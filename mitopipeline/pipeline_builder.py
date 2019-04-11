@@ -17,16 +17,19 @@ class PipelineBuilder():
                             'haplogrep': 'HAPLOGREP'}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extract_mito', 'split_gap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None):
-        is_valid_directories(directory, output, tools)
-        check_tools_exist(tools, steps, self.softwares)
-        self.build_from_template(directory, output, steps, slurm)
+        #TODO: placeholder for mito, need to figure out how to find the /steps folder when running from command line
+        mito = "./"
+        is_valid_directories(directory, tools, steps, self.softwares)
+        self.build_from_template(directory, steps, slurm, mito, output, tools)
 
-    def build_from_template(self, directory, output, steps, slurm):
+    def build_from_template(self, directory, steps, slurm, mito, output, tools):
+        #user specified output or stored within mitopipeline directory
+        output = output if output else mito + "/pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, steps, slurm)
         with open('pipeline.py', 'w+') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil']))
-            pipeline.write(paths_template.render(directory=directory, output=output) + "\n\n")
+            pipeline.write(paths_template.render(directory=directory, output=output, mito=mito, tools=tools) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=list(self.task_names[step] for step in steps if step in self.softwares)) + "\n")
             prev_step = ""
            

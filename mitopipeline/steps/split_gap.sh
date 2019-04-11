@@ -19,7 +19,7 @@ samtools fastq $BAMS/$1_mito.bam -n > $1_old.fastq
 samtools view $BAMS/$1_mito.bam > $1_bam.txt
 
 #1 is bam file id, 2 is new fastq file to write to
-python ./steps/split_bams.py $1 
+python ./split_bams.py $1 
 
 #remove bam txt + old fastq file
 rm $1_bam.txt

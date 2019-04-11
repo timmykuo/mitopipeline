@@ -18,7 +18,7 @@ class CommandLineParser():
         parser = self._build_parser()
         opts = parser.parse_args(argv)
         if not opts.directory:
-            raise ValueError('Directory or file to be run on must be specified')
+            raise ValueError('Directory that contains files to be run must be specified')
         return opts
 
     def build_and_run(self):
@@ -33,9 +33,10 @@ class CommandLineParser():
         #required arguments
         required_args = parser.add_argument_group('required arguments')
         required_args.add_argument('-d', '--directory', help="Path to the directory of files to be run", type=str)
-        required_args.add_argument('-o', '--output', help="Output directory to save pipeline files")
-        required_args.add_argument('-t', '--tools', help="Paths of locations of 3rd party packages")
+        required_args.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages")
         #optional arguments
+        parser.add_argument('-m', '--mito', help="Path of location of mitopipeline package", default="./")
+        parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)
         parser.add_argument('-s', '--save', help="Save files from the middle steps of pipeline instead of only the 3rd party software outputs", default=True, action='store_false')
         parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step", default=False, action='store_true')
         parser.add_argument('-r', '--remove', nargs='+', help="Steps to not run in this pipeline", default=None)
@@ -54,3 +55,7 @@ class CommandLineParser():
             else:
                 raise ValueError("The requested step to remove doesn't exist in the pipeline")
         return steps_to_use
+
+if __name__ == "__main__":
+    cmdline_parser = CommandLineParser()
+    cmdline_parser.build_and_run()

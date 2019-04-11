@@ -17,34 +17,35 @@
 FILE=$1
 START=$2
 OUT=$3
+TOOLS=$4
 echo "*****Patient:$1"
 echo .
 echo .
 echo .
-../tools/bam2fastq-1.1.0/bam2fastq -o $OUT/$1#.fastq $2/$1
+$TOOLS/bam2fastq-1.1.0/bam2fastq -o $OUT/$1#.fastq $2/$1
 
 if [ -e "$OUT/$1_1.fastq" ]
 then
 	echo "SAMPLE IS PAIRED-END"
-	perl ../tools/DetermineFastqQualityEncoding.pl $OUT/$1_1.fastq > $OUT/$1_ENCODING.txt
+	perl $TOOLS/DetermineFastqQualityEncoding.pl $OUT/$1_1.fastq > $OUT/$1_ENCODING.txt
 	grep "offset by 64" $OUT/$1_ENCODING.txt > $OUT/$1_ENCODING_OLD
 
 	if [ -s "$OUT/$1_ENCODING_OLD" ]
 	then
 		echo "*****This base encoding is in ASCII +64"
 		echo "*****Fixing the base encoding with seqtk"
-		../tools/seqtk-master/seqtk seq -Q64 -V $OUT/$1_1.fastq > $OUT/$1_sanger_1.fastq
-		../tools/seqtk-master/seqtk seq -Q64 -V $OUT/$1_2.fastq > $OUT/$1_sanger_2.fastq
+		$TOOLS/seqtk-master/seqtk seq -Q64 -V $OUT/$1_1.fastq > $OUT/$1_sanger_1.fastq
+		$TOOLS/seqtk-master/seqtk seq -Q64 -V $OUT/$1_2.fastq > $OUT/$1_sanger_2.fastq
 		echo "*****BWA Alignment to rCRS of fixed encoding fastq files"
-		../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger_1.fastq > $OUT/$1_1.sai
-		../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger_2.fastq > $OUT/$1_2.sai
-		../tools/bwa-0.6.0/bwa sampe ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.sai $OUT/$1_2.sai $OUT/$1_sanger_1.fastq $OUT/$1_sanger_2.fastq > $OUT/$1_realigned.sam
+		$TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger_1.fastq > $OUT/$1_1.sai
+		$TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger_2.fastq > $OUT/$1_2.sai
+		$TOOLS/bwa-0.6.0/bwa sampe ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.sai $OUT/$1_2.sai $OUT/$1_sanger_1.fastq $OUT/$1_sanger_2.fastq > $OUT/$1_realigned.sam
 		echo "*****Samtools to set up the sorted and indexed .bam file"
 		samtools view -bS $OUT/$1_realigned.sam > $OUT/$1_realigned.bam
 		samtools sort $OUT/$1_realigned.bam $OUT/$1_realigned.sorted
 		samtools index $OUT/$1_realigned.sorted.bam
 		
-		java -Xmx40g -jar ../tools/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
+		java -Xmx40g -jar $TOOLS/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
 		echo .	
 		echo .
 		echo .
@@ -52,49 +53,49 @@ then
 		echo "*****This base encoding is in ASCII 33 / Sanger"
 		echo "*****Continuing with GATK"
 		echo "*****BWA Alignment to rCRS of fixed encoding fastq files"
-                ../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.fastq > $OUT/$1_1.sai
-                ../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_2.fastq > $OUT/$1_2.sai
-                ../tools/bwa-0.6.0/bwa sampe ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.sai $OUT/$1_2.sai $OUT/$1_1.fastq $OUT/$1_2.fastq > $OUT/$1_realigned.sam
+                $TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.fastq > $OUT/$1_1.sai
+                $TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_2.fastq > $OUT/$1_2.sai
+                $TOOLS/bwa-0.6.0/bwa sampe ../REFs/MitoREFs/rCRS.fa $OUT/$1_1.sai $OUT/$1_2.sai $OUT/$1_1.fastq $OUT/$1_2.fastq > $OUT/$1_realigned.sam
                 echo "*****Samtools to set up the sorted and indexed .bam file"
                 samtools view -bS $OUT/$1_realigned.sam > $OUT/$1_realigned.bam
                 samtools sort $OUT/$1_realigned.bam $OUT/$1_realigned.sorted
                 samtools index $OUT/$1_realigned.sorted.bam
 		
-		java -Xmx40g -jar ../tools/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
+		java -Xmx40g -jar $TOOLS/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
         fi
 
 else
 	echo "SAMPLE IS SINGLE-END"
-        perl ../tools/DetermineFastqQualityEncoding.pl $OUT/$1.fastq > $OUT/$1_ENCODING.txt
+        perl $TOOLS/DetermineFastqQualityEncoding.pl $OUT/$1.fastq > $OUT/$1_ENCODING.txt
         grep "offset by 64" $OUT/$1_ENCODING.txt > $OUT/$1_ENCODING_OLD
 	
 	if [ -s "$OUT/$1_ENCODING_OLD" ]
         then
                 echo "*****This base encoding is in ASCII +64"
                 echo "*****Fixing the base encoding with seqtk"
-                ../tools/seqtk-master/seqtk seq -Q64 -V $OUT/$1.fastq > $OUT/$1_sanger.fastq
+                $TOOLS/seqtk-master/seqtk seq -Q64 -V $OUT/$1.fastq > $OUT/$1_sanger.fastq
                 echo "*****BWA Alignment to rCRS of fixed encoding fastq files"
-                ../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger.fastq > $OUT/$1.sai
-                ../tools/bwa-0.6.0/bwa samse ../REFs/MitoREFs/rCRS.fa $OUT/$1.sai $OUT/$1_sanger.fastq > $OUT/$1_realigned.sam
+                $TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1_sanger.fastq > $OUT/$1.sai
+                $TOOLS/bwa-0.6.0/bwa samse ../REFs/MitoREFs/rCRS.fa $OUT/$1.sai $OUT/$1_sanger.fastq > $OUT/$1_realigned.sam
                 echo "*****Samtools to set up the sorted and indexed .bam file"
                 samtools view -bS $OUT/$1_realigned.sam > $OUT/$1_realigned.bam
                 samtools sort $OUT/$1_realigned.bam $OUT/$1_realigned.sorted
                 samtools index $OUT/$1_realigned.sorted.bam
-        	java -Xmx40g -jar ../tools/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
+        	java -Xmx40g -jar $TOOLS/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
                 echo .
                 echo .
                 echo .
         else
                 echo "*****This base encoding is in ASCII 33 / Sanger"
 		echo "*****BWA Alignment to rCRS of fixed encoding fastq files"
-                ../tools/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1.fastq > $OUT/$1.sai
-                ../tools/bwa-0.6.0/bwa samse ../REFs/MitoREFs/rCRS.fa $OUT/$1.sai $OUT/$1.fastq > $OUT/$1_realigned.sam
+                $TOOLS/bwa-0.6.0/bwa aln ../REFs/MitoREFs/rCRS.fa $OUT/$1.fastq > $OUT/$1.sai
+                $TOOLS/bwa-0.6.0/bwa samse ../REFs/MitoREFs/rCRS.fa $OUT/$1.sai $OUT/$1.fastq > $OUT/$1_realigned.sam
                 echo "*****Samtools to set up the sorted and indexed .bam file"
                 samtools view -bS $OUT/$1_realigned.sam > $OUT/$1_realigned.bam
                 samtools sort $OUT/$1_realigned.bam $OUT/$1_realigned.sorted
                 samtools index $OUT/$1_realigned.sorted.bam
 		
-		java -Xmx40g -jar ../tools/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
+		java -Xmx40g -jar $TOOLS/picard-tools-1.93/DownsampleSam.jar INPUT=$OUT/$1_realigned.sorted.bam OUTPUT=$OUT/$1_realigned-0.5.bam PROBABILITY=0.5 VALIDATION_STRINGENCY=SILENT
         fi	
 fi
 rm $OUT/$1*fastq

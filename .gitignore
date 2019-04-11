@@ -5,3 +5,5 @@
 /bin/*
 /build/*
 /mitopipeline.egg-info/
+/mitopipeline/*.pyc
+/mitopipeline/pipeline_output/*

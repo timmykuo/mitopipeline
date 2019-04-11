@@ -3,8 +3,9 @@
 #$1 is the fileNAME
 #$2 is the start directory
 #$3 is the out directory
+#$4 is toosl directory 
 
-TOOLS="./tools/annovar"
+TOOLS=$4
 VCFS=$2"/gatk3_vcfs"
 ANNOVAR=$3"/annovar"
 PILEUPS=$3"/pileups"

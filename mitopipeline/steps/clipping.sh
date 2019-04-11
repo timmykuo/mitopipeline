@@ -10,6 +10,7 @@
 
 START=$2
 OUT=$3
+TOOLS=$4
 module load samtools
 module load bwa
 
@@ -37,12 +38,12 @@ if [ -e "$OUT/${cancertype}_${id}_mito_1.fastq" ]
 then
 echo "PAIRED-END"
         echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-        ./tools/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito_1.fastq > $OUT/$1_mito_CLIPPED_1.fastq
-        ./tools/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito_2.fastq > $OUT/$1_${id}_mito_CLIPPED_2.fastq
+        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito_1.fastq > $OUT/$1_mito_CLIPPED_1.fastq
+        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito_2.fastq > $OUT/$1_${id}_mito_CLIPPED_2.fastq
 else
 echo "SINGLE-END"
         echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-        ./tools/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito.fastq > $OUT/$1_mito_CLIPPED.fastq
+        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_mito.fastq > $OUT/$1_mito_CLIPPED.fastq
 fi
 echo ****Clipping DONE.
 echo .

@@ -12,15 +12,13 @@ def parse_fid(f):
 def is_correct_format(f):
     return str(f).count('.') >= 2
 
-def is_valid_directories(directory, output, tools):
+#checks that directory exists and mito directory contains the "steps" folder
+def is_valid_directories(directory, tools, steps, softwares):
     if not directory:
         raise ValueError('Building the pipeline requires a file/directory to run on')
-    if not output:
-        raise ValueError('Pipeline requires a directory to store output files')
-    if not tools:
-        raise ValueError('Pipeline builder requires a directory that contains all the software tools')
-    if not os.path.isdir("./steps"):
-        raise ValueError('mitopipeline command must be run from the same folder that contains /steps/')
+    check_tools_exist(tools, steps, softwares)
+    #if not os.path.isdir(mito + "/steps"):
+    #    raise ValueError('mito directory must map to the mitopipeline folder that contains /steps/')
 
 #checks that the file format follows our naming convenction
 def check_file_format(directory):
@@ -33,12 +31,17 @@ def check_file_format(directory):
 def check_tools_exist(tools, steps, softwares):
     softwares = list(step for step in steps if step in softwares)
     for software in softwares:
+        if not tools:
+            raise ValueError('Tools directory was not specified and is required if steps include a 3rd party software package')
         if not os.path.isdir(tools + "/" + software):
             raise ValueError(
                 "User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software")
 
 #creates subdirectories for all the requested steps within the specified output directory
 def make_subdirectories(output, steps, slurm):
+    #create output folder that holds the mitopipeline output in the tool's directory
+    if not os.path.isdir(output):
+        os.makedirs(output)
     #TODO: fill in subdirectories for parts within each step
     subdirectories = {'remove_numts': ['fastqs', 'pileups', 'numt_removal_stor', 'counts'],
                         'split_gap': [],

@@ -7,9 +7,10 @@
 # $3 is out directory
 VCFS=$2
 #vcfs was "/mnt/rds/txl80/LaframboiseLab/tyk3/scripts/gatk3_vcfs"
-SNPEFF= $3
+SNPEFF=$3
 #snpeff was "/mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/snpeffs"
-cd ./tools/snpEff
+TOOLS=$4
+cd $TOOLS/snpEff
 module load intel/17
 module load openmpi/2.0.1
 
