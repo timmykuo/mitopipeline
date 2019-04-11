@@ -60,3 +60,13 @@ def make_subdirectories(output, steps, slurm):
                 os.makedirs(output + "/" + sub)
     if slurm:
         os.makedirs(output + "/slurm")
+
+def get_wrapper_tasks(task_names, steps, softwares):
+    tasks = list(task_names[step] for step in steps if step in softwares)
+    if not tasks:
+        for task_name in reversed(list(task_names.keys())):
+            #return the latest task that is not a software step
+            if task_name not in softwares and task_name in steps:
+                return [task_name]
+    else:
+        return tasks

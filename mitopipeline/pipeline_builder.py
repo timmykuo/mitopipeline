@@ -1,5 +1,5 @@
 import os, sys
-from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories, is_valid_directories
+from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories, is_valid_directories, get_wrapper_tasks
 from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
@@ -30,7 +30,7 @@ class PipelineBuilder():
         with open('pipeline.py', 'w+') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil']))
             pipeline.write(paths_template.render(directory=directory, output=output, mito=mito, tools=tools) + "\n\n")
-            pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=list(self.task_names[step] for step in steps if step in self.softwares)) + "\n")
+            pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_names, steps, self.softwares)) + "\n")
             prev_step = ""
            
             #write in the steps requested into the pipeline
