@@ -22,7 +22,7 @@ REFS="./REFs"
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
-java -Xmx8g -jar ./tools/picard-tools-1.93/AddOrReplaceReadGroups.jar \
+java -Xmx8g -jar ../tools/picard-tools-1.93/AddOrReplaceReadGroups.jar \
 I=$BAMS/$1.mito_hg38.sorted.mt.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
@@ -37,7 +37,7 @@ echo *****done*****
 echo *****Picard Mark Duplicates and RealignerTargetCreator $1*****
 touch $TMPDIR/$1.metricsfile.txt
 
-java -Xmx8g -jar ./tools/picard-tools-1.93/MarkDuplicates.jar \
+java -Xmx8g -jar ../tools/picard-tools-1.93/MarkDuplicates.jar \
 INPUT=$TMPDIR/$1.tcga.sort.2.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.bam \
 METRICS_FILE=$TMPDIR/$1.metricsfile.txt \
@@ -45,7 +45,7 @@ CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
 ASSUME_SORTED=true
 
-java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx8g -jar ../tools/gatk/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
 -R $REFS/MitoREFs/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.bam \
@@ -53,14 +53,14 @@ java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****IndelRealigner and Picard Marking $1*****
-java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx8g -jar ../tools/gatk/GenomeAnalysisTK.jar \
 -T IndelRealigner \
 -I $TMPDIR/$1.tcga.marked.bam \
 -R $REFS/MitoREFs/rCRS-MT.fa \
 --targetIntervals $TMPDIR/$1.tcga.list \
 -o $TMPDIR/$1.tcga.marked.realigned.bam
 
-java -Xmx8g -jar ./tools/picard-tools-1.93/FixMateInformation.jar \
+java -Xmx8g -jar ../tools/picard-tools-1.93/FixMateInformation.jar \
 INPUT=$TMPDIR/$1.tcga.marked.realigned.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 SO=coordinate \
@@ -69,7 +69,7 @@ CREATE_INDEX=true
 echo *****done*****
 
 echo *****BaseRecalibrator $1*****
-java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx8g -jar ../tools/gatk/GenomeAnalysisTK.jar \
 -T BaseRecalibrator \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R $REFS/MitoREFs/rCRS-MT.fa \
@@ -78,7 +78,7 @@ java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****PrintReads $1*****
-java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx8g -jar ../tools/gatk/GenomeAnalysisTK.jar \
 -T PrintReads \
 -R $REFS/MitoREFs/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
@@ -87,7 +87,7 @@ java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****HaplotypeCaller $1*****
-java -Xmx10g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx10g -jar ../tools/gatk/GenomeAnalysisTK.jar \
 -T HaplotypeCaller \
 -R $REFS/MitoREFs/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
@@ -104,17 +104,8 @@ java -Xmx10g -jar ./tools/GenomeAnalysisTK.jar \
 -o $TMPDIR/$1.tcga.snps.vcf
 echo *****done*****
 
-#echo *****Starting DepthOfCoverage*****
-#java -Xmx64g -jar /homeG/LaFramboiseLab/sjm67/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar  \
-#-R /homeG/LaFramboiseLab/sjm67/TCGA/hg19_karyo_rCRS/hg19_karyo_rCRS-MT.fa \
-#-T Coverage \
-#-o $1.out.table \
-#-I $1.tcga.marked.realigned.fixed.read.bam \
-#--outputFormat table
-#echo *****done*****
-
 echo *****VariantFiltration $1******
-java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
+java -Xmx8g -jar ./.tools/gatk/GenomeAnalysisTK.jar \
 -R $REFS/MitoREFs/rCRS-MT.fa \
 -T VariantFiltration \
 --variant $TMPDIR/$1.tcga.snps.vcf \
@@ -129,18 +120,5 @@ java -Xmx8g -jar ./tools/GenomeAnalysisTK.jar \
 #rm extract*
 #rm recal*
 #echo *****done*****
-
-echo *****Creating Report $1*****
-#perl /home/sxg501/GATK-ReAnalyze/frequencies.pl $1.snps.recalibrated.filtered.vcf $1.out.txt
-echo *****done*****
-#cp $TMPDIR/$3.snps.recalibrated.filtered.vcf $2/
-echo *****Creating Report $1*****
-#perl /home/sxg501/GATK-ReAnalyze/frequencies.pl $1.snps.recalibrated.filtered.vcf $1.out.txt
-echo *****done*****
-#cp $TMPDIR/$3.snps.recalibrated.filtered.vcf $2/
-#echo ***making pileup file****
-#samtools mpileup -f ~/REFs/MitoREFs/rCRS-MT.fa $TMPDIR/$3.tcga.marked.realigned.fixed.read.bam > ~/GATK-ReAnalyze/Pileups/$3.pileup
-#perl ~/GATK-ReAnalyze/Pileups/pileupstats2.pl ~/GATK-ReAnalyze/Pileups/$3.pileup ~/GATK-ReAnalyze/Pileups/$3.pOUT
-#bash ~/GATK-ReAnalyze/Pileups/pOUT-mod.sh ~/GATK-ReAnalyze/Pileups/$3.pOUT
 mv $TMPDIR/$1.snps.recalibrated.filtered.vcf $3
 echo *****done $1*****

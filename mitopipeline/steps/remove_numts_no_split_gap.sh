@@ -136,7 +136,7 @@ echo .
 echo .
 echo ----BAM2FASTQ $1_cl--rCRS-lowNUMTs.sam Initiated
 samtools view -bS $STOR/$1_cl--rCRS-lowNUMTs.sam > $STOR/$1_cl--rCRS-lowNUMTs.bam
-./tools/bam2fastq-1.1.0/bam2fastq -o $STOR/$1_cl--rCRS-lowNUMTs#.fastq $STOR/$1_cl--rCRS-lowNUMTs.bam
+../tools/bam2fastq-1.1.0/bam2fastq -o $STOR/$1_cl--rCRS-lowNUMTs#.fastq $STOR/$1_cl--rCRS-lowNUMTs.bam
 echo ****BAM2FASTQ DONE.
 echo .
 echo .

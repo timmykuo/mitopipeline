@@ -1,5 +1,5 @@
 import os, sys
-from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories
+from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories, is_valid_directories
 from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
@@ -15,26 +15,11 @@ class PipelineBuilder():
                             'snpeff': 'SNPEFF',
                             'annovar': 'ANNOVAR',
                             'haplogrep': 'HAPLOGREP'}
-        self.job_names = {'extract_mito': ['extract_mito.sh'],
-                            'split_gap': ['split_gap.sh'],
-                            'clipping': ['clipping.sh'],
-                            'remove_numts': ['remove_numts.sh'],
-                            'downsample': ['downsample.sh'],
-                            'gatk': ['gatk.sh'],
-                            'snpeff': ['snpeff.sh'],
-                            'annovar': ['annovar.sh'],
-                            'haplogrep': ['haplogrep.sh']}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extract_mito', 'split_gap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None):
-        if not directory:
-            raise ValueError('Building the pipeline requires a file/directory to run on')
-        if not output:
-            raise ValueError('Pipeline requires a directory to store output files')
-        if not tools:
-            raise ValueError('Pipeline builder requires a directory that contains all the software tools')
-        else:
-            check_tools_exist(tools, steps, self.softwares)
-            self.build_from_template(directory, output, steps, slurm)
+        is_valid_directories(directory, output, tools)
+        check_tools_exist(tools, steps, self.softwares)
+        self.build_from_template(directory, output, steps, slurm)
 
     def build_from_template(self, directory, output, steps, slurm):
         check_file_format(directory)
