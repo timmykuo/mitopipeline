@@ -6,10 +6,10 @@ class PipelineBuilder():
 
     def __init__(self):
         self.softwares = ['gatk', 'snpeff', 'annovar', 'haplogrep']
-        self.task_names = {'extract_mito': 'ExtractMito',
-                            'split_gap': 'SplitGap',
+        self.task_names = {'extractmito': 'ExtractMito',
+                            'splitgap': 'SplitGap',
                             'clipping': 'Clipping',
-                            'remove_numts': 'RemoveNuMTs',
+                            'removenumts': 'RemoveNuMTs',
                             'downsample': 'Downsample',
                             'gatk': 'GATK',
                             'snpeff': 'SNPEFF',
@@ -26,7 +26,7 @@ class PipelineBuilder():
         #user specified output or stored within mitopipeline directory
         output = output if output else mito + "/pipeline_output"
         check_file_format(directory)    
-        make_subdirectories(output, steps, slurm)
+        make_subdirectories(output, self.task_names, steps, slurm)
         with open('pipeline.py', 'w+') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
             pipeline.write(paths_template.render(directory=directory, output=output, tools=tools) + "\n\n")
@@ -36,7 +36,7 @@ class PipelineBuilder():
             #write in the steps requested into the pipeline
             for step in steps:
                 #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
-                if 'split_gap' not in steps and step == 'remove_numts':
+                if 'splitgap' not in steps and step == 'removenumts':
                     job_name = 'remove_numts_no_split_gap.sh'
                 #step only is name of the step, not the name of the script
                 else:

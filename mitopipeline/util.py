@@ -39,15 +39,15 @@ def check_tools_exist(tools, steps, softwares):
                 "User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software")
 
 #creates subdirectories for all the requested steps within the specified output directory
-def make_subdirectories(output, steps, slurm):
+def make_subdirectories(output, task_names, steps, slurm):
     #create output folder that holds the mitopipeline output in the tool's directory
     if not os.path.isdir(output):
         os.makedirs(output)
     #TODO: fill in subdirectories for parts within each step
-    subdirectories = {'remove_numts': ['fastqs', 'pileups', 'numt_removal_stor', 'counts'],
-                        'split_gap': [],
+    subdirectories = {'removenumts': ['fastqs', 'pileups', 'numt_removal_stor', 'counts'],
+                        'splitgap': [],
                         'clipping': [],
-                        'extract_mito': [],
+                        'extractmito': [],
                         'downsample': [],
                         'gatk': [],
                         'annovar': [],
@@ -55,10 +55,13 @@ def make_subdirectories(output, steps, slurm):
                         'snpeff': [],
         }
     for step in steps:
-        if not os.path.isdir(output + "/" + step):
-            os.makedirs(output + "/" + step)
-            for sub in subdirectories[step]:
-                os.makedirs(output + "/" + sub)
+        task_folder = output + "/" + task_names[step]
+        if not os.path.isdir(task_folder):
+            os.makedirs(task_folder)
+        for sub in subdirectories[step]:
+            task_subfolder = task_folder + "/" + sub
+            if not os.path.isdir(task_subfolder):
+                os.makedirs(task_subfolder)
     if slurm:
         os.makedirs(output + "/slurm")
 

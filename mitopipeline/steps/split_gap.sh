@@ -1,12 +1,8 @@
 #!/bin/bash
-# $1: bam file id
-# $2: split fastq file
-
-
 # $1: filename
 # $2: start directory
 # $3: out directory
-
+# $4: tools directory
 module load intel/17  
 module load openmpi/2.0.1
 module load samtools
