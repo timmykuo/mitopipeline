@@ -13,6 +13,12 @@ setup(
         'setuptools',
     ],
 
+    setup_requires=[
+        'jinja2',
+        'luigi',
+        'setuptools'
+    ],
+
     entry_points = '''
         [console_scripts]
         mitopipeline=mitopipeline.cmdline:run

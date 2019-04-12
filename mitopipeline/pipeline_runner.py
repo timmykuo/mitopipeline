@@ -7,7 +7,7 @@ class PipelineRunner():
         if not os.path.isfile(filename):
             raise FileNotFoundError("Pipeline file was not found. Ensure that the directory and output paths are correct")
         else:
-            command = "PYTHONPATH=\'.\' luigi --module pipeline RunDataPipeline --workers " + opts.workers + " --local-scheduler"
+            command = "PYTHONPATH=\'.\' luigi --module pipeline PipelineRunner --workers " + str(opts.workers)+ " --local-scheduler"
             os.system(command)
 
     # @classmethod

@@ -7,7 +7,8 @@ def parse_fid(f):
     #filename is FILENAME.bam i.e., hasn't been processed yet
     else:
         parsed = str(f).split(".")
-    return parsed[0]
+    #concatenate up to the last element of the split file i.e. the filename
+    return '_'.join(parsed[:-1])
 
 def correct_format(f):
     return str(f).count('.') < 2
@@ -67,6 +68,7 @@ def get_wrapper_tasks(task_names, steps, softwares):
         for task_name in reversed(list(task_names.keys())):
             #return the latest task that is not a software step
             if task_name not in softwares and task_name in steps:
-                return [task_name]
+                #return the name of function in template instead of the step name
+                return [task_names[task_name]]
     else:
         return tasks

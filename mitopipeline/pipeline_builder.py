@@ -36,7 +36,7 @@ class PipelineBuilder():
             #write in the steps requested into the pipeline
             for step in steps:
                 #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
-                if 'split_gap' in steps and step == 'remove_numts':
+                if 'split_gap' not in steps and step == 'remove_numts':
                     job_name = 'remove_numts_no_split_gap.sh'
                 #step only is name of the step, not the name of the script
                 else:
