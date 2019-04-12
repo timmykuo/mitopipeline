@@ -25,11 +25,11 @@ class PipelineBuilder():
     def build_from_template(self, directory, steps, slurm, mito, output, tools):
         #user specified output or stored within mitopipeline directory
         output = output if output else mito + "/pipeline_output"
-        check_file_format(directory)
+        check_file_format(directory)    
         make_subdirectories(output, steps, slurm)
         with open('pipeline.py', 'w+') as pipeline:
-            pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil']))
-            pipeline.write(paths_template.render(directory=directory, output=output, mito=mito, tools=tools) + "\n\n")
+            pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkgutil']))
+            pipeline.write(paths_template.render(directory=directory, output=output, tools=tools) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_names, steps, self.softwares)) + "\n")
             prev_step = ""
            

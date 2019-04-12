@@ -5,7 +5,7 @@ import_template = Template("{% for module in imports %}import {{ module }}\n{% e
 
 #template for directory and output paths
 paths_template = Template(
-    'STEPS = "{{ mito }}/steps"\nPIPELINE_START = "{{ directory }}"\nPIPELINE_STORE = "{{ output }}"\nSLURM_DIR = "{{ output }}/slurm"\nTOOLS = "{{ tools }}"\n')
+    'STEPS = os.path.join(os.path.dirname(__file__), \'steps\')\nPIPELINE_START = "{{ directory }}"\nPIPELINE_STORE = "{{ output }}"\nSLURM_DIR = "{{ output }}/slurm"\nTOOLS = "{{ tools }}"\n')
 
 #template for a task without any requirements
 task_template = Template(
