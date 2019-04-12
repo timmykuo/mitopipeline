@@ -9,8 +9,8 @@ def parse_fid(f):
         parsed = str(f).split(".")
     return parsed[0]
 
-def is_correct_format(f):
-    return str(f).count('.') >= 2
+def correct_format(f):
+    return str(f).count('.') < 2
 
 #checks that directory exists and mito directory contains the "steps" folder
 def is_valid_directories(directory, tools, steps, softwares):
@@ -23,9 +23,9 @@ def is_valid_directories(directory, tools, steps, softwares):
 #checks that the file format follows our naming convenction
 def check_file_format(directory):
     for f in os.listdir(directory):
-        if not is_correct_format(f):
+        if not correct_format(f):
             raise ValueError(
-                "All files saved in user-specified directory must follow the format 'FILENAME.bam'")
+                "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
 #check that all tools requested in steps are in the tools directory
 def check_tools_exist(tools, steps, softwares):
