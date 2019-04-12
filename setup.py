@@ -8,14 +8,17 @@ setup(
 
     #add samtools, bwa, etc. here
     install_requires=[
-        'jinja2'
+        'jinja2',
+        'luigi',
+        'setuptools',
     ],
 
     entry_points = '''
         [console_scripts]
         mitopipeline=mitopipeline.cmdline:run
     ''',
-    package_data={},
+    package_data={'mitopipeline': ['steps/*']},
+    include_package_data=True,
 
     #metadata
     author="Timothy Kuo",

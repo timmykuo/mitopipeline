@@ -10,5 +10,8 @@ class PipelineRunner():
             command = "PYTHONPATH=\'.\' luigi --module pipeline RunDataPipeline --workers " + opts.workers + " --local-scheduler"
             os.system(command)
 
+    # @classmethod
+    # def cleanup(cls, steps):
+
 
 
