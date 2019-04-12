@@ -7,6 +7,6 @@
 /mitopipeline/*.pyc
 /mitopipeline/pipeline_output/*
 /mitopipeline/pipeline.py
-pipeline.py
+/pipeline.py
 /__pycache__/*
 
