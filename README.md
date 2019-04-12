@@ -22,4 +22,4 @@ This tool should handle all dependency management in-between each step for the u
 - Accurately log successes and failures that occurred while running the pipeline
 
 ### Acknowledgements
-Many of the steps in the pipeline were adapted from scripts written by Sneha Grandhi. Check out her [Github](https://github.com/sneha-grandhi), [LinkedIn](https://www.linkedin.com/in/sneha-grandhi-phd-0165aa58/), or contact her through her [email](sneha_grandhi@hms.harvard.edu).
+Many of the steps in the pipeline were adapted from scripts written by Sneha Grandhi. Check out her [Github](https://github.com/sneha-grandhi), [LinkedIn](https://www.linkedin.com/in/sneha-grandhi-phd-0165aa58/), or contact her through her  email: sneha_grandhi@hms.harvard.edu.
