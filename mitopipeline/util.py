@@ -1,15 +1,11 @@
 import os
 
 def parse_fid(f):
-    #if the file has been processed through at least one step in the pipeline
-    if "_" in f:
-        parsed = str(f).split("_")
-    #filename is FILENAME.bam i.e., hasn't been processed yet
-    else:
-        parsed = str(f).split(".")
-    #concatenate up to the last element of the split file i.e. the filename
-    return '_'.join(parsed[:-1])
+    #filename is FILENAME.bam i.e.
+    parsed = str(f).split(".")
+    return parsed[0]
 
+#ensure that all files in starting directory only has one period for the filename's extension, i.e. FILENAME.bam
 def correct_format(f):
     return str(f).count('.') < 2
 
@@ -55,7 +51,8 @@ def make_subdirectories(output, task_names, steps, slurm):
                         'snpeff': [],
         }
     for step in steps:
-        task_folder = output + "/" + task_names[step]
+        folder_name = 0
+        task_folder = output + "/" + task_names[step][folder_name]
         if not os.path.isdir(task_folder):
             os.makedirs(task_folder)
         for sub in subdirectories[step]:
@@ -67,11 +64,12 @@ def make_subdirectories(output, task_names, steps, slurm):
 
 def get_wrapper_tasks(task_names, steps, softwares):
     tasks = list(task_names[step] for step in steps if step in softwares)
+    folder_name = 0
     if not tasks:
         for task_name in reversed(list(task_names.keys())):
             #return the latest task that is not a software step
             if task_name not in softwares and task_name in steps:
                 #return the name of function in template instead of the step name
-                return [task_names[task_name]]
+                return [task_names[task_name][folder_name]]
     else:
         return tasks

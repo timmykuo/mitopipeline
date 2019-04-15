@@ -4,13 +4,13 @@ from mitopipeline.pipeline_builder import PipelineBuilder
 from mitopipeline.pipeline_runner import PipelineRunner
 class CommandLineParser():
 
-    ALL_STEPS = ['extract_mito', 'split_gap', 'clipping', 'remove_numts', 'downsample',
+    ALL_STEPS = ['extractmito', 'splitgap', 'clipping', 'removenumts', 'downsample',
                  'gatk', 'snpeff', 'annovar', 'haplogrep']
     DEPENDENCIES = {'snpeff': ['gatk'],
                 'annovar': ['gatk'],
                 'haplogrep': ['gatk'],
-                'gatk': ['remove_numts'],
-                'remove_numts': ['extract_mito', 'clip', 'split_gap']}
+                'gatk': ['removenumts'],
+                'remove_numts': ['extractmito', 'clip', 'splitgap']}
 
     def __init__(self, argv=sys.argv[1:]):
         self.__opts = self.parse_commands(argv)
@@ -24,8 +24,8 @@ class CommandLineParser():
 
     def build_and_run(self):
         pipeline_builder = PipelineBuilder()
-        pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output)
-        PipelineRunner.run('./pipeline.py', self.__opts)
+        pipeline = pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output)
+        PipelineRunner.run(pipeline, self.__opts)
         # if not opts.save:
         #     PipelineRunner.cleanup()
         

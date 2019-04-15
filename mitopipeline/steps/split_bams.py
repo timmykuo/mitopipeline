@@ -9,12 +9,12 @@ READID_LOC = 0
 NEXT_ID_LOC = 4
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
-def split_bam(f_id):
-    new_fastq = open(f_id + ".fastq", "w")
+def split_bam(output, f_id):
+    new_fastq = open(output + "/" + f_id + ".fastq", "w")
     #unsplitables = open(f_id + "_no_split.fastq", "w")
     oldfq_id = 0
-    with open(f_id + "_bam.txt") as bam:
-        with open(f_id + "_old.fastq") as old_fastq:
+    with open(output + "/" + f_id + "_bam.txt") as bam:
+        with open(output + "/" + f_id + "_old.fastq") as old_fastq:
             #split old fqs into array format per line
             oldfq = old_fastq.read().split()
             for line in bam:
@@ -78,4 +78,4 @@ def add_next_seq(temp_idx, curr_num, new_reads, reads, new_quals, quals):
 
 if __name__ == "__main__":
     argv = sys.argv[1:]
-    split_bam(argv[0])
+    split_bam(argv[0], argv[1])
