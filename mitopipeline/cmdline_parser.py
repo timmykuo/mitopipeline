@@ -24,8 +24,8 @@ class CommandLineParser():
 
     def build_and_run(self):
         pipeline_builder = PipelineBuilder()
-        pipeline = pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output)
-        PipelineRunner.run(pipeline, self.__opts)
+        pipeline_loc = pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output)
+        PipelineRunner.run(pipeline_loc, self.__opts)
         # if not opts.save:
         #     PipelineRunner.cleanup()
         

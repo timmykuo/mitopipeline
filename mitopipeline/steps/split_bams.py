@@ -10,7 +10,7 @@ NEXT_ID_LOC = 4
 ALPHABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 def split_bam(output, f_id):
-    new_fastq = open(output + "/" + f_id + ".fastq", "w")
+    new_fastq = open(output + "/" + f_id + "_splitgap.fastq", "w")
     #unsplitables = open(f_id + "_no_split.fastq", "w")
     oldfq_id = 0
     with open(output + "/" + f_id + "_bam.txt") as bam:

@@ -18,24 +18,20 @@ class PipelineBuilder():
                             'annovar': ['ANNOVAR', ''],
                             'haplogrep': ['HAPLOGREP', '']}
 
-    def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extract_mito', 'split_gap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None):
-        #TODO: placeholder for mito, need to figure out how to find the /steps folder when running from command line
-        mito = "./"
+    def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None):
         is_valid_directories(directory, tools, steps, self.softwares)
-        return self.build_from_template(directory, steps, slurm, mito, output, tools)
+        return self.build_from_template(directory, steps, slurm, output, tools)
 
-    def build_from_template(self, directory, steps, slurm, mito, output, tools):
+    def build_from_template(self, directory, steps, slurm, output, tools):
         #user specified output or stored within mitopipeline directory
-        output = output if output else mito + "/pipeline_output"
+        output = output if output else "./pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, self.task_template_info, steps, slurm)
-        pkg_dir = pkg_resources.resource_filename('mitopipeline', '/')
-        with open(pkg_dir + '/pipeline.py', 'w+') as pipeline:
+        with open('./pipeline.py', 'w') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
             pipeline.write(paths_template.render(directory=directory, output=output, tools=tools) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_template_info, steps, self.softwares)) + "\n")
             prev_step = ""
-           
             #write in the steps requested into the pipeline
             for step in steps:
                 #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
@@ -46,8 +42,8 @@ class PipelineBuilder():
                     job_name = step + ".sh"
                 pipeline.write(self.get_template(slurm, prev_step, job_name, step))
                 if "gatk" in step or step not in self.softwares:
-                    prev_step = self.task_template_info[step]
-        return pkg_dir + "/pipeline.py"
+                    prev_step = self.task_template_info[step][self.FOLDER_NAME]
+        return output
              
     def get_template(self, slurm, prev_step, job_name, step):
         task_name = self.task_template_info[step][self.FOLDER_NAME]

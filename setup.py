@@ -4,6 +4,7 @@ setup(
     name="mitopipeline",
     version="0.13",
     packages=['mitopipeline'],
+    package_dir={'mitopipeline': 'mitopipeline'},
     py_modules=['mitopipeline'],
 
     #add samtools, bwa, etc. here
@@ -23,7 +24,7 @@ setup(
         [console_scripts]
         mitopipeline=mitopipeline.cmdline:run
     ''',
-    package_data={'mitopipeline': ['/mitopipeline/steps/*']},
+    package_data={'mitopipeline': ['steps/*']},
 
     #metadata
     author="Timothy Kuo",

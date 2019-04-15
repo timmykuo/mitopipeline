@@ -3,11 +3,11 @@ import sys, os
 class PipelineRunner():
 
     @classmethod
-    def run(cls, filename, opts):
-        if not os.path.isfile(filename):
+    def run(cls, pipeline_loc, opts):
+        if not os.path.isfile(pipeline_loc + "/pipeline.py"):
             raise FileNotFoundError("Pipeline file was not found. Ensure that the directory and output paths are correct")
         else:
-            command = "PYTHONPATH=\'.\' luigi --module pipeline PipelineRunner --workers " + str(opts.workers)+ " --local-scheduler"
+            command = "PYTHONPATH=\'"+pipeline_loc+"\' luigi --module pipeline PipelineRunner --workers " + str(opts.workers)+ " --local-scheduler"
             os.system(command)
 
     # @classmethod
