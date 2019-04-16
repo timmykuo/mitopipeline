@@ -10,13 +10,13 @@ def correct_format(f):
     return str(f).count('.') < 2
 
 #checks that directory exists and mito directory contains the "steps" folder
-def is_valid_directories(directory, tools, steps, softwares):
-    if not directory:
+def is_valid_directories(directory, tools, refs, steps, softwares):
+    if not os.path.isdir(directory):
         raise ValueError('Building the pipeline requires a file/directory to run on')
+    if not os.path.isdir(refs) and ("gatk" in steps or "removenumts" in steps):
+        raise ValueError('GATK and RemoveNuMTs steps require a directory for the reference genomes')
     check_tools_exist(tools, steps, softwares)
-    #if not os.path.isdir(mito + "/steps"):
-    #    raise ValueError('mito directory must map to the mitopipeline folder that contains /steps/')
-
+    
 #checks that the file format follows our naming convenction
 def check_file_format(directory):
     for f in os.listdir(directory):

@@ -18,18 +18,18 @@ class PipelineBuilder():
                             'annovar': ['ANNOVAR', ''],
                             'haplogrep': ['HAPLOGREP', '']}
 
-    def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None):
-        is_valid_directories(directory, tools, steps, self.softwares)
-        return self.build_from_template(directory, steps, slurm, output, tools)
+    def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
+        is_valid_directories(directory, tools, refs, steps, self.softwares)
+        return self.build_from_template(directory, steps, slurm, output, tools, refs)
 
-    def build_from_template(self, directory, steps, slurm, output, tools):
+    def build_from_template(self, directory, steps, slurm, output, tools, refs):
         #user specified output or stored within mitopipeline directory
         output = output if output else "./pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, self.task_template_info, steps, slurm)
         with open('./pipeline.py', 'w') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
-            pipeline.write(paths_template.render(directory=directory, output=output, tools=tools) + "\n\n")
+            pipeline.write(paths_template.render(directory=directory, output=output, tools=tools, refs=refs) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_template_info, steps, self.softwares)) + "\n")
             prev_step = ""
             #write in the steps requested into the pipeline
@@ -48,6 +48,7 @@ class PipelineBuilder():
     def get_template(self, slurm, prev_step, job_name, step):
         task_name = self.task_template_info[step][self.FOLDER_NAME]
         file_name = self.task_template_info[step][self.EXTENSION]
+        prev_file_name = self.task_template_info[prev_step][self.EXTENSION]
         #if slurm job requested
         if slurm:
             #first step in the pipeline has no 'require' function
@@ -55,11 +56,11 @@ class PipelineBuilder():
                 return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
+                return slurm_task_with_req_template.render(task_name=task_name, prev_step=prev_file_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
         else:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
                 return task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return task_with_req_template.render(task_name=task_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
+                return task_with_req_template.render(task_name=task_name, prev_step=prev_file_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"

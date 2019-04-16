@@ -24,8 +24,8 @@ class CommandLineParser():
 
     def build_and_run(self):
         pipeline_builder = PipelineBuilder()
-        pipeline_loc = pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output)
-        PipelineRunner.run(pipeline_loc, self.__opts)
+        pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=self.remove_steps(self.__opts.remove), output=self.__opts.output, refs=self.__opts.refs)
+        PipelineRunner.run(self.__opts)
         # if not opts.save:
         #     PipelineRunner.cleanup()
         
@@ -35,8 +35,8 @@ class CommandLineParser():
         required_args = parser.add_argument_group('required arguments')
         required_args.add_argument('-d', '--directory', help="Path to the directory of files to be run", type=str)
         required_args.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages")
+        required_args.add_argument('-f', '--refs', help="Path of location of reference genomes", default=None)
         #optional arguments
-        parser.add_argument('-m', '--mito', help="Path of location of mitopipeline package", default="./")
         parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)
         parser.add_argument('-s', '--save', help="Save files from the middle steps of pipeline instead of only the 3rd party software outputs", default=True, action='store_false')
         parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step", default=False, action='store_true')
@@ -56,7 +56,3 @@ class CommandLineParser():
             else:
                 raise ValueError("The requested step to remove doesn't exist in the pipeline")
         return steps_to_use
-
-if __name__ == "__main__":
-    cmdline_parser = CommandLineParser()
-    cmdline_parser.build_and_run()

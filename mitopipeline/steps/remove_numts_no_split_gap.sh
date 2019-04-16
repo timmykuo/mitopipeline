@@ -25,11 +25,11 @@ function CountReads {
 samtools view -c -F 4 $START/$2$1.sorted.bam > $COUNTS/$2$1.count
 }
 
-#Align $filename _cl--rCRS $REF/MitoREFs/rCRS-MT.fa
+#Align $filename _cl--rCRS $REF/rCRS-MT.fa
 function Align {
 #use bwa aln and samse for shorter sequences, look into options for bwa aln if inaccurate sam files
-bwa aln $4 $FASTQS/$1.fastq > $STOR/$1_$2.sai
-bwa samse $4 $STOR/$1_$2.sai $FASTQS/$1.fastq > $STOR/$1_$2.sam
+bwa aln $3 $FASTQS/$1.fastq > $STOR/$1_$2.sai
+bwa samse $3 $STOR/$1_$2.sai $FASTQS/$1.fastq > $STOR/$1_$2.sam
 }
 
 
@@ -42,8 +42,8 @@ bwa mem -t 12 $4 $FASTQS/$1.fastq > $STOR/$1$2.sam
 fi
 }
 
-#AlignNUMTS _cl--rCRS ${id} ${cancer_type} pileup $REF/MitoREFs/rCRS-MT.fa ${cancer_type}_${id}_cl-NM--lowNUMTs.sam lowNUMTs
-#AlignNUMTS _cl--rCRS $filename pileup $REF/MitoREFs/rCRS-MT.fa $filename_cl-NM--lowNUMTs.sam lowNUMTs
+#AlignNUMTS _cl--rCRS ${id} ${cancer_type} pileup $REF/rCRS-MT.fa ${cancer_type}_${id}_cl-NM--lowNUMTs.sam lowNUMTs
+#AlignNUMTS _cl--rCRS $filename pileup $REF/rCRS-MT.fa $filename_cl-NM--lowNUMTs.sam lowNUMTs
 function AlignNUMTS {
 awk 'FNR==NR{a[$1]++;next}!a[$1]' $STOR/$5 $STOR/$2$1.sam > $STOR/$2$1-$6.sam
 samtools view -bS $STOR/$2$1-$6.sam > $STOR/$2$1-$6.bam
@@ -92,7 +92,7 @@ fi
 }
 
 echo ----bwa alignment to rCRS
-Align _mito_CLIPPED $1 _cl--rCRS $REF/MitoREFs/rCRS.fa pileup
+Align _mito_CLIPPED $1 _cl--rCRS $REF/rCRS.fa pileup
 echo ****bwa alignment to rCRS DONE.
 echo .
 echo .
@@ -125,7 +125,7 @@ echo .
 echo .
 echo .
 echo ----Generate $1_cl--rCRS-lowNUMTS.pileup
-AlignNUMTS _cl--rCRS $1 pileup $REF/MitoREFs/rCRS.fa $1_cl-NM--lowNUMTs.sam lowNUMTs
+AlignNUMTS _cl--rCRS $1 pileup $REF/rCRS.fa $1_cl-NM--lowNUMTs.sam lowNUMTs
 CountReads _cl--rCRS-lowNUMTs $1
 echo ****Generate $1_cl--rCRS-lowNUMTS.pileup DONE.
 echo ****NUMTs DONE.
@@ -169,7 +169,7 @@ echo ----samtools Started
 samtools view -bS $STOR/$1.mito_hg38.sam > $STOR/$1.mito_hg38.bam
 samtools sort $STOR/$1.mito_hg38.bam $STOR/$1.mito_hg38.sorted.bam
 samtools index $SCR/$1.mito_hg38.sorted.bam
-samtools view -b $STOR/$1.mito_hg38.sorted.bam MT > $NEW_BAMS/$1..mito_hg38.sorted.mt.bam
+samtools view -b $STOR/$1.mito_hg38.sorted.bam MT > $NEW_BAMS/$1_removenumts.bam
 echo ****samtools DONE.
 echo .
 echo .
