@@ -5,6 +5,8 @@
 #$4 is start directory
 #$5 is out directory
 #$6 is the tools directory 
+# $7 is steps directory
+# $8 is the refs directory 
 if [ ! -f $3/slurm/$2_$1.slurm ];
 then
 FILE="$3/slurm/$2_$1.slurm"
@@ -17,7 +19,7 @@ echo '#SBATCH --time=24:00:00' >> $FILE
 echo '#SBATCH --mem=25GB' >> $FILE
 echo '#SBATCH -J '"$2_$1" >> $FILE
 echo '#SBATCH -A txl80' >> $FILE
-echo 'bash ./steps/'"$2"'.sh '"$1 $4 $5 $6"' >> '"$3"'/STDOUT/'"$2"'_'"$1"'.out 2>&1' >> $FILE
+echo 'bash '"$7"'/steps/'"$2"'.sh '"$1 $4 $5 $6 $7 $8"' >> '"$3"'/STDOUT/'"$2"'_'"$1"'.out 2>&1' >> $FILE
 sleep 1
 fi
 
