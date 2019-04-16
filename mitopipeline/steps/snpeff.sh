@@ -1,19 +1,18 @@
-# $1 filename
-# $2 path to snpeff tool
-# $3 path to store
-
+#!/usr/bin
 # $1 is filename
 # $2 is start directory
 # $3 is out directory
+# $4 is the tools directory
+# $5 is the steps directory
+# $6 is the refs directory
+
 VCFS=$2
-#vcfs was "/mnt/rds/txl80/LaframboiseLab/tyk3/scripts/gatk3_vcfs"
 SNPEFF=$3
-#snpeff was "/mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/snpeffs"
 TOOLS=$4
-cd $TOOLS/snpEff
+
 module load intel/17
 module load openmpi/2.0.1
+#last string following / delimeter will be name of the previous job
+filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
-java -Xmx4g -jar snpEff.jar GRCh38.86 $VCFS/$1.snps.recalibrated.filtered.vcf > $SNPEFF/$1_snpEff.vcf
-
-java -Xmx4g -jar snpEff.jar GRCh38.86 -classic $VCFS/$1.snps.recalibrated.filtered.vcf > $SNPEFF/$1_formatEff.vcf
+java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf

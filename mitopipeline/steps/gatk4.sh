@@ -16,14 +16,15 @@
 module load intel/17
 module load openmpi/2.0.1
 module load samtools
-TMPDIR=$3"/temp"
-BAMS=$2"/no_numts_bams"
-#### $2 is the OUT DIR where you want the final.vcf file to be saved.
+TMPDIR=$3"/gatk_stor"
+BAMS=$2
+#last string following / delimeter will be name of the previous job
+filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
 cd /mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/no_numts_bams
 echo *****AddOrReplaceReadGroups $1*****
 java -Xmx8g -jar ./tools/picard-tools-1.93/AddOrReplaceReadGroups.jar \
-I=$BAMS/$1.mito_hg38.sorted.mt.bam \
+I=$BAMS/$1_${filetype}.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
 

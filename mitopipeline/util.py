@@ -20,7 +20,8 @@ def is_valid_directories(directory, tools, refs, steps, softwares):
 #checks that the file format follows our naming convenction
 def check_file_format(directory):
     for f in os.listdir(directory):
-        if not correct_format(f):
+        #ignore hidden files
+        if not f.startswith('.') and not correct_format(f):
             raise ValueError(
                 "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
@@ -45,7 +46,7 @@ def make_subdirectories(output, task_names, steps, slurm):
                         'clipping': [],
                         'extractmito': [],
                         'downsample': [],
-                        'gatk': [],
+                        'gatk': ['gatk_stor'],
                         'annovar': [],
                         'haplogrep': [],
                         'snpeff': [],

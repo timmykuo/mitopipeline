@@ -14,7 +14,7 @@ STOR=$3"/numt_removal_stor"
 PILEUPS=$3"/pileups"
 START=$2
 filename=$1
-#last string following / delimeter will be name of the job
+#last string following / delimeter will be name of the previous job
 filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
 module load intel/17
@@ -23,7 +23,7 @@ module load samtools
 module load bwa
 
 function CountReads {
-samtools view -c -F 4 $START/$2$1.sorted.bam > $COUNTS/$2$1.count
+samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 }
 
 #Align $filename _cl--rCRS $REF/rCRS-MT.fa
@@ -33,7 +33,6 @@ bwa aln $3 $START/$1_$filetype.fastq > $STOR/$1_$2.sai
 bwa samse $3 $STOR/$1_$2.sai $START/$1_$filetype.fastq > $STOR/$1$2.sam
 }
 
-#AlignNUMTS _cl--rCRS ${id} ${cancer_type} pileup $REF/rCRS-MT.fa ${cancer_type}_${id}_cl    -NM--lowNUMTs.sam lowNUMTs
 #AlignNUMTS _cl--rCRS $filename pileup $REF/rCRS-MT.fa $filename_cl -NM--lowNUMTs.sam lowNUMTs
 function AlignNUMTS {
 awk 'FNR==NR{a[$1]++;next}!a[$1]' $STOR/$5 $STOR/$2$1.sam > $STOR/$2$1-$6.sam
@@ -41,12 +40,6 @@ samtools view -bS $STOR/$2$1-$6.sam > $STOR/$2$1-$6.bam
 samtools sort $STOR/$2$1-$6.bam -o $STOR/$2$1-$6.sorted.bam
 samtools mpileup -B -C 50 -f $4 $STOR/$2$1-$6.sorted.bam > $PILEUPS/$2$1-$6.$3
 }
-
-#$1 = _cl--nuclear.sam
-#$2 = ${id}
-#$3 = ${cancer_type}
-#$4 = _cl-NM
-#$5 = _cl--NUMTs.sam
 
 #$1 = _cl--nuclear.sam
 #$2 = $filename
@@ -87,10 +80,9 @@ echo .
 echo .
 echo .
 echo ----bwa alignment to hg38-norCRS --NUMTs: going to make ${filename}_cl--nuclear.sam
-cd $STOR
 #use bwa aln and samse for short reads
-bwa aln $REF/hg38-nochr.fa $FASTQS/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sai
-bwa samse $REF/hg38-nochr.fa $STOR/${filename}_cl--nuclear.sai $FASTQS/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sam 
+bwa aln $REF/hg38-nochr.fa $START/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sai
+bwa samse $REF/hg38-nochr.fa $STOR/${filename}_cl--nuclear.sai $START/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sam 
 echo ****bwa alignment to hg38-norCRS DONE.
 echo .
 echo .
@@ -121,7 +113,6 @@ echo .
 echo .
 echo ----BAM2FASTQ ${filename}_cl--rCRS-lowNUMTs.sam Initiated
 samtools view -bS $STOR/${filename}_cl--rCRS-lowNUMTs.sam > $STOR/${filename}_cl--rCRS-lowNUMTs.bam
-#/home/sxg501/local/bam2fastq-1.1.0/bam2fastq -o $FASTQS/${cancer_type}_${id}_cl--rCRS-lowNUMTs#.fastq $RAW_BAMS/${cancer_type}_${id}_cl--rCRS-lowNUMTs.bam
 samtools fastq $STOR/${filename}_cl--rCRS-lowNUMTs.bam > $STOR/${filename}_cl--rCRS-lowNUMTs.fastq
 echo ****BAM2FASTQ DONE.
 echo .
@@ -140,7 +131,6 @@ echo .
 echo .
 echo .
 echo .
-
 echo ----samtools Started
 samtools view -bS $STOR/${filename}.mito_hg38.sam > $STOR/${filename}.mito_hg38.bam
 samtools sort $STOR/${filename}.mito_hg38.bam -o $STOR/${filename}.mito_hg38.sorted.bam

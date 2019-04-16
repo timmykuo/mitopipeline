@@ -8,7 +8,7 @@ class PipelineBuilder():
         self.FOLDER_NAME = 0
         self.EXTENSION = 1
         self.softwares = ['gatk', 'snpeff', 'annovar', 'haplogrep']
-        self.task_template_info = {'extractmito': ['ExtractMito', 'mito.bam'],
+        self.task_template_info = {'extractmito': ['ExtractMito', 'extractmito.bam'],
                             'splitgap': ['SplitGap', 'splitgap.fastq'],
                             'clipping': ['Clipping', 'clipping.fastq'],
                             'removenumts': ['RemoveNuMTs', 'removenumts.bam'],
@@ -16,7 +16,9 @@ class PipelineBuilder():
                             'gatk': ['GATK', 'gatk.vcf'],
                             'snpeff': ['SNPEFF', 'snpeff.eff'],
                             'annovar': ['ANNOVAR', ''],
-                            'haplogrep': ['HAPLOGREP', '']}
+                            'haplogrep': ['HAPLOGREP', ''],
+                            #for empty prevstep
+                            '': ['', '']}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
@@ -42,13 +44,13 @@ class PipelineBuilder():
                     job_name = step + ".sh"
                 pipeline.write(self.get_template(slurm, prev_step, job_name, step))
                 if "gatk" in step or step not in self.softwares:
-                    prev_step = self.task_template_info[step][self.FOLDER_NAME]
+                    prev_step = step
         return output
              
     def get_template(self, slurm, prev_step, job_name, step):
         task_name = self.task_template_info[step][self.FOLDER_NAME]
         file_name = self.task_template_info[step][self.EXTENSION]
-        prev_file_name = self.task_template_info[prev_step][self.EXTENSION]
+        prev_file_name = self.task_template_info[prev_step][self.FOLDER_NAME]
         #if slurm job requested
         if slurm:
             #first step in the pipeline has no 'require' function
@@ -56,11 +58,11 @@ class PipelineBuilder():
                 return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return slurm_task_with_req_template.render(task_name=task_name, prev_step=prev_file_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
+                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_file_name, job_name=job_name, file_name=file_name) + "\n"
         else:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
                 return task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return task_with_req_template.render(task_name=task_name, prev_step=prev_file_name, req_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
+                return task_with_req_template.render(task_name=task_name, req_name=prev_file_name, job_name=job_name, file_name=file_name) + "\n"

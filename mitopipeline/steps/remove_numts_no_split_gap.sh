@@ -1,14 +1,12 @@
-### $4 is the file size
-### $3 is the Cancer Type
-### $2 is the Target file ID
-### $1 is the download ID
-
-
+#!/bin/bash
 #$1 is filename
 #$2 is start directory
 #$3 is out directory
+### $4 is tools directory
+### $5 is steps directory
+### $6 is the refs directory
 
-REF="./REFs"
+REF=$6
 COUNTS=$3"/counts"
 FASTQS=$3"/fastqs"
 NEW_BAMS=$3
@@ -16,33 +14,37 @@ STOR=$3"/numt_removal_stor"
 PILEUPS=$3"/pileups"
 START=$2
 TOOLS=$4
+filename=$1
+#last string following / delimeter will be name of the previous job
+filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
 module load samtools
 module load bwa
 module load gdc/1.3.0
 
 function CountReads {
-samtools view -c -F 4 $START/$2$1.sorted.bam > $COUNTS/$2$1.count
+samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
+}
+
+function Align {
+if [ -e "$START/$1_1.fastq" ]
+then
+bwa mem -t 12 $4 $START/$1_1.fastq $SCR2/$3_$2$1_2.fastq > $SCR2/$3_$2$4.sam
+else
+bwa mem -t 12 $4 $START/$1.fastq > $SCR2/$3_$2$4.sam
+fi
 }
 
 #Align $filename _cl--rCRS $REF/rCRS-MT.fa
 function Align {
-#use bwa aln and samse for shorter sequences, look into options for bwa aln if inaccurate sam files
-bwa aln $3 $FASTQS/$1.fastq > $STOR/$1_$2.sai
-bwa samse $3 $STOR/$1_$2.sai $FASTQS/$1.fastq > $STOR/$1_$2.sam
-}
-
-
-function Align {
-if [ -e "$FASTQS/$1_1.fastq" ]
+if [ -e "$START/$1_1.fastq" ]
 then
-bwa mem -t 12 $4 $FASTQS/$1_1.fastq $FASTQS/$1_2.fastq > $STOR/$1$2.sam
+bwa mem -t 12 $3 $START/$1_1.fastq $START/$1_2.fastq > $STOR/$1$2.sam
 else
-bwa mem -t 12 $4 $FASTQS/$1.fastq > $STOR/$1$2.sam
+bwa mem -t 12 $3 $START/$1.fastq > $STOR/$1$2.sam
 fi
 }
 
-#AlignNUMTS _cl--rCRS ${id} ${cancer_type} pileup $REF/rCRS-MT.fa ${cancer_type}_${id}_cl-NM--lowNUMTs.sam lowNUMTs
 #AlignNUMTS _cl--rCRS $filename pileup $REF/rCRS-MT.fa $filename_cl-NM--lowNUMTs.sam lowNUMTs
 function AlignNUMTS {
 awk 'FNR==NR{a[$1]++;next}!a[$1]' $STOR/$5 $STOR/$2$1.sam > $STOR/$2$1-$6.sam
@@ -50,13 +52,6 @@ samtools view -bS $STOR/$2$1-$6.sam > $STOR/$2$1-$6.bam
 samtools sort $STOR/$2$1-$6.bam $STOR/$2$1-$6.sorted.bam
 samtools mpileup -B -C 50 -q 40 -Q 30 -f $4 $STOR/$2$1-$6.sorted.bam > $PILEUPS/$2$1-$6.$3
 }
-
-
-#$1 = _cl--nuclear.sam
-#$2 = ${id}
-#$3 = ${cancer_type}
-#$4 = _cl-NM
-#$5 = _cl--NUMTs.sam
 
 #$1 = _cl--nuclear.sam
 #$2 = $filename
@@ -81,7 +76,7 @@ awk '$1==1{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsSingleReads
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i0NUMTsSingleReads $STOR/$2$3i1NUMTsSingleReads > $STOR/$2$3NUMTsDupsReads
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3NUMTsDupsReads $STOR/$2$1 >  $STOR/$2$3NUMTsDups.sam
 
-if [ -e "$FASTQS/$2_1.fastq" ]
+if [ -e "$START/$2_1.fastq" ]
 then
 	echo PAIRED-END, removing all mate pairs which align with up to 1 mismatch to nuclear genome
 	cat $STOR/$2$3i0NUMTs.sam $STOR/$2$3i1NUMTs.sam $STOR/$2$3NUMTsDups.sam > $STOR/$2$3--lowNUMTs.sam
@@ -101,11 +96,11 @@ echo .
 echo .
 echo .
 echo ----bwa alignment to hg38-norCRS --NUMTs: going to make $1_cl--nuclear.sam
-if [ -e "$STOR/$1_CLIPPED_1.fastq" ]
+if [ -e "$START/$1_1.fastq" ]
 then
-bwa mem -t 12 $REF/hg38-nochr.fa $FASTQS/$1_mito_CLIPPED_1.fastq $FASTQS/$1_mito_CLIPPED_2.fastq > $STOR/$1_cl--nuclear.sam
+bwa mem -t 12 $REF/hg38-nochr.fa $START/$1_1.fastq $START/$1_2.fastq > $STOR/$1_cl--nuclear.sam
 else
-bwa mem -t 12 $REF/hg38-nochr.fa $FASTQS/$1_mito_CLIPPED.fastq > $STOR/$1_cl--nuclear.sam
+bwa mem -t 12 $REF/hg38-nochr.fa $START/$1.fastq > $STOR/$1_cl--nuclear.sam
 fi
 echo ****bwa alignment to hg38-norCRS DONE.
 echo .
@@ -185,8 +180,3 @@ echo .
 echo .
 echo ----Moving / Deleting Files
 mv $STOR/$1_cl--rCRS-lowNUMTs.fastq $FASTQS
-# mv $STOR/$1.mito_hg38.sorted.bam $OUTdir/gdc-mito-bams/
-# mv $SCR/$1.mito_hg38.sorted.bam.bai $OUTdir/gdc-mito-bams/
-# mv $SCR/$1_cl--rCRS-lowNUMTs.pileup $OUTdir/gdc-mito-pileups/
-# rm $SCR/$1*
-# rm $STOR/$1*

@@ -1,30 +1,27 @@
 #!/usr/bin/
 #script.sh
-#runs with pipeline.sh and frequencies.sh; .bed file optional
-#central file for processing .bams
-# *****always fix comments and chromosomes and I/O!!!!***********
 ###############
-#### $1 - bam file to process along with file path
-#### $2 - directory to store vcfs
-#### $3 - filename unique identifier ex. BLCA_A0C8_01.mito_hg38
-#### $4 - mtDNA Copy Number (used in GATK) use 100 if you can't find it on gdc portal
 ################
-
 #$1 - filename
 #$2 - start directory
 #$3 - out directory
-
+#$4 - tools directory
+#$5 is steps directory
+#$6 is the refs directory
+##############
 module load samtools
-TMPDIR=$3"/temp"
-BAMS=$2"/no_numts_bams"
-REFS="./REFs"
+TMPDIR=$3"/gatk_stor"
+BAMS=$2
+REFS=$6
 TOOLS=$4
 #### $2 is the OUT DIR where you want the final.vcf file to be saved.
+#last string following / delimeter will be name of the previous job
+filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
 java -Xmx8g -jar $TOOLS/picard-tools-1.93/AddOrReplaceReadGroups.jar \
-I=$BAMS/$1.mito_hg38.sorted.mt.bam \
+I=$BAMS/$1_${filetype}.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
 RGID=TLL \
@@ -48,7 +45,7 @@ ASSUME_SORTED=true
 
 java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.bam \
 -o $TMPDIR/$1.tcga.list
 echo *****done*****
@@ -57,7 +54,7 @@ echo *****IndelRealigner and Picard Marking $1*****
 java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T IndelRealigner \
 -I $TMPDIR/$1.tcga.marked.bam \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 --targetIntervals $TMPDIR/$1.tcga.list \
 -o $TMPDIR/$1.tcga.marked.realigned.bam
 
@@ -73,7 +70,7 @@ echo *****BaseRecalibrator $1*****
 java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T BaseRecalibrator \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 -o $TMPDIR/$1.recal_data.grp \
 --knownSites ./dbsnp/mtONLY.vcf 
 echo *****done*****
@@ -81,7 +78,7 @@ echo *****done*****
 echo *****PrintReads $1*****
 java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T PrintReads \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -BQSR $TMPDIR/$1.recal_data.grp \
 -o $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam
@@ -90,7 +87,7 @@ echo *****done*****
 echo *****HaplotypeCaller $1*****
 java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T HaplotypeCaller \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
 --maxReadsInRegionPerSample 200 \
 --sample_ploidy 100 \
@@ -107,7 +104,7 @@ echo *****done*****
 
 echo *****VariantFiltration $1******
 java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--R $REFS/MitoREFs/rCRS-MT.fa \
+-R $REFS/rCRS-MT.fa \
 -T VariantFiltration \
 --variant $TMPDIR/$1.tcga.snps.vcf \
 -o $TMPDIR/$1.snps.recalibrated.filtered.vcf \
@@ -121,5 +118,5 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 #rm extract*
 #rm recal*
 #echo *****done*****
-mv $TMPDIR/$1.snps.recalibrated.filtered.vcf $3
+mv $TMPDIR/$1.snps.recalibrated.filtered.vcf $3/$1_gatk.vcf
 echo *****done $1*****
