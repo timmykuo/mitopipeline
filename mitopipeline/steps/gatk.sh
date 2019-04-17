@@ -111,12 +111,5 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 --filterExpression "QD < 2.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
 --filterName "my_snp_filter" \
 
-#rm paired*
-#rm tcga*
-#rm metrics*
-#rm snps*
-#rm extract*
-#rm recal*
-#echo *****done*****
 mv $TMPDIR/$1.snps.recalibrated.filtered.vcf $3/$1_gatk.vcf
 echo *****done $1*****
