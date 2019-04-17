@@ -6,10 +6,11 @@
 Welcome to mitopipeline's documentation!
 ========================================
 
+.. include:: ../README.rst
+
 .. toctree::
    :maxdepth: 2
 
-   readme.rst
    example_one_genome.rst
    pipeline_builder.rst
    running_the_pipeline.rst
