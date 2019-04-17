@@ -1,7 +1,7 @@
 Tool Setup
 ----------
 This project can be downloaded through ``pip install mitopipeline`` to install any dependencies. You can also directly download it through the source code at
-`Hadoop <http://hadoop.apache.org/>`_
+
 Users will have to download samtools and bwa, ``make`` them, and include the path to the executable in their $PATH variable or copy them to their ``bin`` folder so that they can be run from the command line. Download links for `samtools  <http://www.htslib.org/download/>`_ and `bwa <https://sourceforge.net/projects/bio-bwa/>`_. In addition, 3rd party software packages that they wish to use on their own (such as GATK, ANNOVAR, etc.) need to be downloaded before being able to use them in the pipeline.
 
 Ensure that the directory where the tool is going to run on has the same naming convention. All files should be bam files and should end with a .bam extension. All steps within the pipeline will use the filename as the id, and add a _<stepname> to the filename id. For example, for filename ABCD.bam, the result of split_bam will be ABCD_splitbam.bam
