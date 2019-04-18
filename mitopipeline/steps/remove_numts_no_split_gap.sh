@@ -18,10 +18,6 @@ filename=$1
 #last string following / delimeter will be name of the previous job
 filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
-module load samtools
-module load bwa
-module load gdc/1.3.0
-
 function CountReads {
 samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 }

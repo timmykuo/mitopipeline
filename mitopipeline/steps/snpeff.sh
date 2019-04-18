@@ -9,9 +9,6 @@
 VCFS=$2
 SNPEFF=$3
 TOOLS=$4
-
-module load intel/17
-module load openmpi/2.0.1
 #last string following / delimeter will be name of the previous job
 filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 

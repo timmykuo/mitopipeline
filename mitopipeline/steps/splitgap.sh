@@ -4,10 +4,6 @@
 # $3: out directory
 # $4: tools directory
 # $5: setup directory
-module load intel/17  
-module load openmpi/2.0.1
-module load samtools
-
 BAMS=$2
 
 #old fastq file used by split_bams.py
