@@ -19,9 +19,17 @@ class PipelineBuilder():
                             'haplogrep': ['HAPLOGREP', ''],
                             #for empty prevstep
                             '': ['', '']}
+        self.dependencies = {'snpeff': ['snpeff'],
+                        'annovar': ['annovar'],
+                        'gatk': ['gatk', 'picard', 'rCRS'],
+                        'removenumts': ['samtools', 'bwa', 'rCRS', 'hg38-nocrs'],
+                        'clipping': ['samtools', 'bwa', 'bedtools', 'seqtk'],
+                        'extractmito': ['samtools'],
+                        'splitgap': ['samtools']}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
+        check_tools_exist(tools, steps, self.dependencies)
         return self.build_from_template(directory, steps, slurm, output, tools, refs)
 
     def build_from_template(self, directory, steps, slurm, output, tools, refs):

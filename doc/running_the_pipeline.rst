@@ -6,7 +6,15 @@ This section explores various ways to actually run the pipeline. Although some o
 Luigi
 -----
 
-As mentioned before, the dependency management of the pipeline is handled through a python package called luigi. However, currently the only options available when running luigi are adjusting the number of workers. You can read more about workers `here <https://luigi.readthedocs.io/en/stable/api/luigi.worker.html>`_
+As mentioned before, the dependency management of the pipeline is handled through a python package called `luigi <https://github.com/spotify/luigi>`_. However, currently the only options available when running luigi are adjusting the number of workers. You can read more about workers `here <https://luigi.readthedocs.io/en/stable/api/luigi.worker.html>`_
+
+Luigi handles dependency management through class objects called Targets and Tasks. Targets are a Task’s output. A Task is run after a required Task is complete and also outputs a Target for a next Task to be run. For example, the workflow for two tasks running on a database can be shown like this:	
+
+
+.. figure:: https://raw.githubusercontent.com/timmykuo/mitopipeline/master/doc/luigi_tasks_targets.png
+
+
+In this diagram, the first task takes in the data from the database as input and outputs a target. The target is then input to the next task to be run. In order for the second task to be run, it “requires” the first task to be finished first. This is tracked through the existence of the first task’s output (the target). Once it sees the target in the output, the 2nd task will begin  running. The advantage of such a design is its asynchronous processes. Since the time for each individual file may be different for the same task, having a worker that looks solely for the output target allows for the multiple tasks to be run at the same time.
 
 Softwares
 ---------
@@ -16,5 +24,13 @@ There are two options for specifying where the softwares' folder location will b
 Using Slurm Jobs
 ----------------
 
+Some servers have slurm set up on their system.
+
 Tmux
 ----
+
+Currently, luigi's scheduler is not implemented within this tool and only uses a local scheduler (read in luigi's docs). Thus, it requires that whatever process that is running mitopipeline to be continually running. One way to do this is to run it on a server using a tmux session. You can read more about tmux here.
+
+Once tmux is downloaded, you can start a new tmux session by typing ``tmux`` into your command line. Then, after beginning the pipeline through the ``mitopipeline`` command, you can exit the session by pressing ``ctrl+b`` and then ``d``. This will detach the current tmux session from your terminal.
+
+In order to reenter your tmux session, you can type in ``tmux ls`` in order to list all of your sessions and then ``tmux a -t <your-session-id>`` to re-enter that tmux session where your mitopipeline is running.

@@ -6,7 +6,10 @@ This section explores the different options that are possible when running the t
 Required Arguments
 ------------------
 
+.. csv-table::
+    :header: "Option", "Description"
 
+    "'-
 
 Optional Arguments
 ------------------

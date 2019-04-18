@@ -1,4 +1,5 @@
-import os
+import os, shutil, pkg_resources
+TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 def parse_fid(f):
     #filename is FILENAME.bam i.e.
@@ -15,7 +16,6 @@ def is_valid_directories(directory, tools, refs, steps, softwares):
         raise ValueError('Building the pipeline requires a file/directory to run on')
     if not os.path.isdir(refs) and ("gatk" in steps or "removenumts" in steps):
         raise ValueError('GATK and RemoveNuMTs steps require a directory for the reference genomes')
-    check_tools_exist(tools, steps, softwares)
     
 #checks that the file format follows our naming convenction
 def check_file_format(directory):
@@ -25,15 +25,30 @@ def check_file_format(directory):
             raise ValueError(
                 "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
-#check that all tools requested in steps are in the tools directory
-def check_tools_exist(tools, steps, softwares):
-    softwares = list(step for step in steps if step in softwares)
+#check that all tools required in steps are in the tools directory
+def check_tools_exist(tools_dir, steps, dependencies):
+    softwares = set(dependencies[step] for step in steps)
     for software in softwares:
-        if not tools:
-            raise ValueError('Tools directory was not specified and is required if steps include a 3rd party software package')
-        if not os.path.isdir(tools + "/" + software):
+        if not os.path.isdir(tools_dir + "/" + software) and not shutil.which(software):
             raise ValueError(
-                "User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software")
+                "User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software or provide its' executable the specified tools directory")
+
+#TODO: double check this function
+def is_downloaded(program):
+    def is_exe(fpath):
+        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
+    fpath, fname = os.path.split(TOOLS + "/" + program)
+    if fpath:
+        if is_exe(program):
+            return True
+    else:
+        for path in os.environ["PATH"].split(os.pathsep):
+            exe_file = os.path.join(path, program)
+            if is_exe(exe_file):
+                return True
+
+    return False
 
 #creates subdirectories for all the requested steps within the specified output directory
 def make_subdirectories(output, task_names, steps, slurm):
