@@ -6,9 +6,7 @@ Users will have to download samtools and bwa, ``make`` them, and include the pat
 
 Purpose
 -------
-The purpose of this tool is to provide a useful pipeline for genetic researchers working with the mitochondrial genome. 
-
-In genetics research, raw genome data requires many different softwares to be run first to extract useful information such as variant information before it can be analyzed. Thus, we want to provide a pipeline that allows users to streamline their processing automatically for them. 
+In genetics research, researchers often require raw genome data to be run on different softwares first to extract useful information such as variant information before it can be analyzed. Thus, we want to provide a pipeline that allows users to streamline their processing automatically for them. 
 
 The steps included within this pipeline include extracting mitochondrial genome from human genome, clipping, splitting the gap for Complete Genomics data, alignment into NuMT removals, and other software packages such as GATK, SNPEFF, ANNOVAR.
 
