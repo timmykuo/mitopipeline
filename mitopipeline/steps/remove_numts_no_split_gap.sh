@@ -22,15 +22,6 @@ function CountReads {
 samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 }
 
-function Align {
-if [ -e "$START/$1_1.fastq" ]
-then
-bwa mem -t 12 $4 $START/$1_1.fastq $SCR2/$3_$2$1_2.fastq > $SCR2/$3_$2$4.sam
-else
-bwa mem -t 12 $4 $START/$1.fastq > $SCR2/$3_$2$4.sam
-fi
-}
-
 #Align $filename _cl--rCRS $REF/rCRS-MT.fa
 function Align {
 if [ -e "$START/$1_1.fastq" ]
@@ -83,7 +74,7 @@ fi
 }
 
 echo ----bwa alignment to rCRS
-Align _mito_CLIPPED $1 _cl--rCRS $REF/rCRS.fa pileup
+Align $1 _cl--rCRS $REF/rCRS.fa
 echo ****bwa alignment to rCRS DONE.
 echo .
 echo .
