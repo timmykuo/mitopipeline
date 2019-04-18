@@ -18,6 +18,7 @@ class Downloader:
                         'bwa': 'git clone https://github.com/lh3/bwa.git',
                         'bam2fastq': 'git clone --recursive https://github.com/jts/bam2fastq',
                         'seqtk': 'git clone https://github.com/lh3/seqtk.git',
+                        'picard': 'https://github.com/broadinstitute/picard/releases/download/2.19.1/picard.jar',
                         'rCRS': 'rCRS',
                         'hg38-nocrs': 'hg38-norcrs'}
 
@@ -28,7 +29,7 @@ class Downloader:
             return software.startswith("git clone")
         for step in steps:
             for software in self.dependencies[step]:
-                if not is_downloaded(software):
+                if not is_downloaded(software, tools):
                     print('Downloading software dependencies for ' + step)
                     if is_link(self.downloads[software]):
                         self.download_link(software, self.downloads[software])

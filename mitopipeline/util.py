@@ -1,4 +1,4 @@
-import os, shutil, pkg_resources
+import os, shutil, pkg_resources, shutil.which
 TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 def parse_fid(f):
@@ -29,16 +29,19 @@ def check_file_format(directory):
 def check_tools_exist(tools_dir, steps, dependencies):
     softwares = set(dependencies[step] for step in steps)
     for software in softwares:
-        if not os.path.isdir(tools_dir + "/" + software) and not shutil.which(software):
-            raise ValueError(
-                "User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software or provide its' executable the specified tools directory")
+        in_mito_tools = downloaded(software, TOOLS) or downloaded(software, TOOLS + "/" + software) or shutil.which(software)
+        if tools_dir:
+            if not downloaded(software, tools_dir) and not downloaded(software, tools_dir + "/" + software) and not in_mito_tools:
+                raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in the specified tools directory")
+        elif not in_mito_tools:
+            raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable")
 
 #TODO: double check this function
-def is_downloaded(program):
+def downloaded(program, tools):
     def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    fpath, fname = os.path.split(TOOLS + "/" + program)
+    fpath, fname = os.path.split(tools)
     if fpath:
         if is_exe(program):
             return True

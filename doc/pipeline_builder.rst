@@ -27,7 +27,7 @@ This snippet extracts the mitochondrial genome from the bam file that was passed
 Clipping
 --------
 
-Requirements: samtools, bwa, bam2fastq, seqtk-master
+Requirements: samtools, bwa, bam2fastq, seqtk
 
 
 

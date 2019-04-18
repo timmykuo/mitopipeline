@@ -1,7 +1,7 @@
 Running the Pipeline
 ********************
 
-This section explores various ways to actually run the pipeline. Although some of these options are described in Command Line options, this will delve into more details
+This section explores details about running the pipeline such as the tools it uses, its requirements, and some suggestions on how to run it. Although some of these options are described in Command Line options, this will delve into more details.
 
 Luigi
 -----
@@ -19,17 +19,29 @@ In this diagram, the first task takes in the data from the database as input and
 Softwares
 ---------
 
-There are two options for specifying where the softwares' folder location will be. 
+As descrbied in the pipeine steps section, all of the steps have some software requirements in order to be run. There are two options for getting the softwares necessary. 
+
+The first choice is to use the command line option ``-d``. For example, the command
+
+.. code:: console
+
+    $ mitopipeline -d -r annovar snpeff
+
+will download all the necessary software into mitopipeline's tool's directory for all steps except for annovar and snpeff. You can then use the mitopipeline normally.
+
+The second choice is to specify a directory that has all the necessary softwares downloaded. Keep in mind that mitopipeline will check for the naming convention of the software's folder that contains its executable as the same name as the step i.e. 'gatk' step will look for a folder called 'gatk' within the specified directory for a gatk.jar executable. 
+
+The pipeline will also check for if an executable is available from the command line. For example, if ``samtools`` and ``bwa`` can be executed on the command line (in your $PATH) and is not in the tools directory, that is acceptable.
 
 Using Slurm Jobs
 ----------------
 
-Some servers have slurm set up on their system.
+Some servers have the `slurm workload manager <https://slurm.schedmd.com/overview.html>`_ set up on their system. If you are using such a server, an available option is to use the option ``-l``. This will submit slurm jobs for each step of the pipeline for each file and save the files in a folder within the specified -out directory.
 
 Tmux
 ----
 
-Currently, luigi's scheduler is not implemented within this tool and only uses a local scheduler (read in luigi's docs). Thus, it requires that whatever process that is running mitopipeline to be continually running. One way to do this is to run it on a server using a tmux session. You can read more about tmux here.
+Currently, luigi's scheduler is not implemented within this tool and only uses its local scheduler (read in luigi's docs). Thus, it requires that whatever process that is running mitopipeline to be continually running. One way to do this is to run it on a server using a tmux session. You can read more about tmux here.
 
 Once tmux is downloaded, you can start a new tmux session by typing ``tmux`` into your command line. Then, after beginning the pipeline through the ``mitopipeline`` command, you can exit the session by pressing ``ctrl+b`` and then ``d``. This will detach the current tmux session from your terminal.
 
