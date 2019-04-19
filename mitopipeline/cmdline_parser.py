@@ -4,9 +4,6 @@ from mitopipeline.pipeline_builder import PipelineBuilder
 from mitopipeline.pipeline_runner import PipelineRunner
 class CommandLineParser():
 
-    ALL_STEPS = ['extractmito', 'splitgap', 'clipping', 'removenumts', 'downsample',
-                 'gatk', 'snpeff', 'annovar', 'haplogrep']
-
     def __init__(self, argv=sys.argv[1:]):
         self.__opts = self.parse_commands(argv)
 
@@ -15,9 +12,8 @@ class CommandLineParser():
         opts = parser.parse_args(argv)
         return opts
 
-    def build_and_run(self):
+    def build_and_run(self, steps):
         pipeline_builder = PipelineBuilder()
-        steps = self.remove_steps(self.__opts.remove)
         pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.refs)
         PipelineRunner.run(self.__opts)
         # if not opts.save:
@@ -32,7 +28,6 @@ class CommandLineParser():
         #optional arguments
         parser.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages")
         parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)
-        parser.add_argument('-s', '--save', help="Save files from the middle steps of pipeline instead of only the 3rd party software outputs", default=True, action='store_false')
         parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step", default=False, action='store_true')
         parser.add_argument('-d', '--download', help="Specify softwares you want to download", default=False, action='store_true')
         parser.add_argument('-r', '--remove', nargs='+', help="Steps to not run in this pipeline", default=None)
@@ -40,14 +35,3 @@ class CommandLineParser():
         parser.add_argument('-w', '--workers', type=int, help="Number of workers to use to run the pipeline", default=1)
 
         return parser
-
-    def remove_steps(self, steps):
-        if not steps:
-            return self.ALL_STEPS
-        steps_to_use = self.ALL_STEPS
-        for step in steps:
-            if step in steps_to_use:
-                steps_to_use.remove(step)
-            else:
-                raise ValueError("The requested step to remove doesn't exist in the pipeline")
-        return steps_to_use

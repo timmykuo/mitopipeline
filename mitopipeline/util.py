@@ -1,4 +1,4 @@
-import os, shutil, pkg_resources, shutil.which
+import os, shutil, pkg_resources
 TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 def parse_fid(f):
@@ -26,21 +26,40 @@ def check_file_format(directory):
                 "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
 #check that all tools required in steps are in the tools directory
-def check_tools_exist(tools_dir, steps, dependencies):
+def get_tools_loc(tools_dir, steps, dependencies):
+    software_loc = {}
     softwares = set(dependencies[step] for step in steps)
     for software in softwares:
-        in_mito_tools = downloaded(software, TOOLS) or downloaded(software, TOOLS + "/" + software) or shutil.which(software)
-        if tools_dir:
-            if not downloaded(software, tools_dir) and not downloaded(software, tools_dir + "/" + software) and not in_mito_tools:
-                raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in the specified tools directory")
-        elif not in_mito_tools:
-            raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable")
+        loc = get_loc(software, tools_dir)
+        software_loc[software] = loc
+    return software_loc
 
-#TODO: double check this function
-def downloaded(program, tools):
-    def is_exe(fpath):
+def get_loc(software, tools_dir):
+    #if available from command line
+    if shutil.which(software):
+        return 'command'
+    #check if downloaded in mitopipeline's tools directory or subdirectory
+    elif is_downloaded(software, TOOLS):
+        return TOOLS
+    elif is_downloaded(software, TOOLS + "/" + software):
+        return TOOLS + "/" + software
+    #check if downloaded in user-specified tools directory or subdirectory
+    elif tools_dir:
+        if is_downloaded(software, tools_dir):
+            return tools_dir
+        elif is_downloaded(software, tools_dir + "/" + software):
+            return tools_dir + "/" + software
+        else:
+            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in the specified tools directory")
+    else:
+        raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable")
+
+
+def is_exe(fpath):
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
+#TODO: double check this function
+def is_downloaded(program, tools):
     fpath, fname = os.path.split(tools)
     if fpath:
         if is_exe(program):

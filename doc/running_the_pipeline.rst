@@ -31,7 +31,7 @@ will download all the necessary software into mitopipeline's tool's directory fo
 
 The second choice is to specify a directory that has all the necessary softwares downloaded. Keep in mind that mitopipeline will check for the naming convention of the software's folder that contains its executable as the same name as the step i.e. 'gatk' step will look for a folder called 'gatk' within the specified directory for a gatk.jar executable. 
 
-The pipeline will also check for if an executable is available from the command line. For example, if ``samtools`` and ``bwa`` can be executed on the command line (in your $PATH) and is not in the tools directory, that is acceptable.
+A number of softwares are necessary to be run on the command line as they are called directly through the bash scripts. In particular, 'samtools' and 'bwa' need to be able to be executed through the comand line. On MacOSX/Linux, this can be achieved by either copying the executable to your ``/usr/local/bin`` folder or adding the folder of your executable to your $PATH variable. 
 
 Using Slurm Jobs
 ----------------

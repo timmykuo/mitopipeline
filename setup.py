@@ -24,7 +24,8 @@ setup(
         [console_scripts]
         mitopipeline=mitopipeline.cmdline:run
     ''',
-    package_data={'mitopipeline': ['steps/*', 'tools/']},
+    package_data={'mitopipeline': ['steps/*'],
+                    'mitopipeline': ['tools/*']},
 
     #metadata
     author="Timothy Kuo",

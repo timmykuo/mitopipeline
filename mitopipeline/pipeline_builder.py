@@ -1,5 +1,5 @@
 import os, sys, pkg_resources
-from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories, is_valid_directories, get_wrapper_tasks
+from mitopipeline.util import get_tools_loc, check_file_format, make_subdirectories, is_valid_directories, get_wrapper_tasks
 from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
@@ -29,17 +29,17 @@ class PipelineBuilder():
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
-        check_tools_exist(tools, steps, self.dependencies)
-        return self.build_from_template(directory, steps, slurm, output, tools, refs)
+        tools_loc = get_tools_loc(tools, steps, self.dependencies)
+        return self.build_from_template(directory, steps, slurm, output, tools_loc, refs)
 
-    def build_from_template(self, directory, steps, slurm, output, tools, refs):
+    def build_from_template(self, directory, steps, slurm, output, tools_loc, refs):
         #user specified output or stored within mitopipeline directory
         output = output if output else "./pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, self.task_template_info, steps, slurm)
         with open('./pipeline.py', 'w') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
-            pipeline.write(paths_template.render(directory=directory, output=output, tools=tools, refs=refs) + "\n\n")
+            pipeline.write(paths_template.render(directory=directory, output=output, refs=refs) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_template_info, steps, self.softwares)) + "\n")
             prev_step = ""
             #write in the steps requested into the pipeline
