@@ -24,11 +24,13 @@ Running Pipeline
     "``-s`` or ``--start``", "| **REQUIRED**. 
     | Specifies the directory that contains the files to be run on. 
     | **Input**: <path/to/startdirectory>"
-    "``-t``, ``---tools``", "| Specifies the location of the folder that contains all of the 3rd party software.
+    "``-g``, ``--genomes``", "| **REQUIRED**.
+    | Specifies location of the folder that contains the human reference genomes. The required genomes for this pipeline are hg38-nochr.fa (the human genome without the mitochondrial genome), hg38.fa (the entire human genome), and rCRS.fa (the human mitochondrial genome). The file names must match the ones listed here so that the steps are able to find the files. You can also download these human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
+    | **Input:** <path/to/REFs/directory>"
+    "``-t``, ``---tools``", "| **REQUIRED**.
+    | Specifies the location of the folder that contains all of the 3rd party software. The executables must have the same name as the step, i.e. gatk should have an executable within </path/to/tools/gatk> called gatk.jar.
     | **Input**: <path/to/tools/directory>
     | **Default**: <path/to/mitopipeline/tools/directory>"
-    "``-g``, ``--genomes``", "| Specifies location of the folder that contains the human reference genomes. The required genomes for this pipeline are hg38-nochr.fa (the human genome without the mitochondrial genome), hg38.fa (the entire human genome), and rCRS.fa (the human mitochondrial genome). The file names must match the ones listed here so that the steps are able to find the files. You can also download these human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
-    | **Input:** <path/to/REFs/directory>"
     "``-o`` or ``--output``", "| Specifies where to store the output of the pipeline results. Will create folders for each step within the output directory.
     | **Input**: <path/to/output/directory>
     | **Default**: current directory"

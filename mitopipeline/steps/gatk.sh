@@ -14,13 +14,14 @@ TMPDIR=$3"/gatk_stor"
 BAMS=$2
 REFS=$6
 TOOLS=$4
+STEPS=$5
 #### $2 is the OUT DIR where you want the final.vcf file to be saved.
 #last string following / delimeter will be name of the previous job
 filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
-java -Xmx8g -jar $TOOLS/AddOrReplaceReadGroups.jar \
+java -Xmx8g -jar $STEPS/tools/AddOrReplaceReadGroups.jar \
 I=$BAMS/$1_${filetype}.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
@@ -35,7 +36,7 @@ echo *****done*****
 echo *****Picard Mark Duplicates and RealignerTargetCreator $1*****
 touch $TMPDIR/$1.metricsfile.txt
 
-java -Xmx8g -jar $TOOLS/MarkDuplicates.jar \
+java -Xmx8g -jar $STEPS/tools/MarkDuplicates.jar \
 INPUT=$TMPDIR/$1.tcga.sort.2.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.bam \
 METRICS_FILE=$TMPDIR/$1.metricsfile.txt \
@@ -43,7 +44,7 @@ CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
 ASSUME_SORTED=true
 
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 -T RealignerTargetCreator \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.bam \
@@ -51,14 +52,14 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****IndelRealigner and Picard Marking $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 -T IndelRealigner \
 -I $TMPDIR/$1.tcga.marked.bam \
 -R $REFS/rCRS-MT.fa \
 --targetIntervals $TMPDIR/$1.tcga.list \
 -o $TMPDIR/$1.tcga.marked.realigned.bam
 
-java -Xmx8g -jar $TOOLS/FixMateInformation.jar \
+java -Xmx8g -jar $STEPS/tools/FixMateInformation.jar \
 INPUT=$TMPDIR/$1.tcga.marked.realigned.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 SO=coordinate \
@@ -67,7 +68,7 @@ CREATE_INDEX=true
 echo *****done*****
 
 echo *****BaseRecalibrator $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 -T BaseRecalibrator \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R $REFS/rCRS-MT.fa \
@@ -76,7 +77,7 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****PrintReads $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 -T PrintReads \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
@@ -85,7 +86,7 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****HaplotypeCaller $1*****
-java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx10g -jar $TOOLS/gatk/gatk.jar \
 -T HaplotypeCaller \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
@@ -103,7 +104,7 @@ java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 echo *****done*****
 
 echo *****VariantFiltration $1******
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 -R $REFS/rCRS-MT.fa \
 -T VariantFiltration \
 --variant $TMPDIR/$1.tcga.snps.vcf \

@@ -97,11 +97,31 @@ To do this, we first align our input fastq files to both the mitochondrial genom
 GATK
 ----
 
-Requirements: GATK-3.1, picard-1.93, hg38 mitochondrial reference genome (rCRS-MT.fa)
+Requirements: gatk-3.1, picard, hg38 mitochondrial reference genome (rCRS-MT.fa)
 
 The gatk script were adapted from the suggested pipeline by GATK. In particular, the following steps are run in order:
 
-Picard's AddOrReplaceReadGroups, Picard's MarkDuplicates, GATK's RealignerTargetCreator, GATK's IndelRealigner, GATK's FixMateInformation, GATK's BaseRecalibrator, GATK's PrintReads, GATK's HaplotypeCaller, GATK's VariantFiltration
+Picard's AddOrReplaceReadGroups, Picard's MarkDuplicates, GATK's RealignerTargetCreator, GATK's IndelRealigner, GATK's FixMateInformation, GATK's BaseRecalibrator, GATK's PrintReads, GATK's HaplotypeCaller, GATK's VariantFiltration.
+
+An example of how gatk is called:
+
+.. code:: bash
+
+    java -Xmx10g -jar $TOOLS/gatk/gatk.jar \
+    -T HaplotypeCaller \
+    -R $REFS/rCRS-MT.fa \
+    -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
+    --maxReadsInRegionPerSample 200 \
+    --sample_ploidy 100 \
+    -stand_call_conf 50 \
+    -stand_emit_conf 10 \
+    --pcr_indel_model HOSTILE \
+    -minPruning 10 \
+    -A StrandAlleleCountsBySample \
+    --dbsnp $5/dbsnp/mtONLY.vcf \
+    -o $TMPDIR/$1.tcga.snps.vcf
+
+Something important to note is that the gatk.jar executable must be placed within a folder called gatk within the tool's directory.
 
 SNPEFF
 ------
@@ -112,7 +132,9 @@ This use's snpeff's most basic command and using the most recent mitochondrial r
 
 .. code:: bash
 
-    java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+    java -Xmx4g -jar $TOOLS/snpEff/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+
+This is the standard usage of snpEff. You can read more about it on their website. Also note that the snpEff executable must be placed within a snpEff folder within the tool's directory just like gatk.
 
 ANNOVAR
 -------

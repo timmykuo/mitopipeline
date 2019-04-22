@@ -12,4 +12,4 @@ TOOLS=$4
 #last string following / delimeter will be name of the previous job
 filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 
-java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+java -Xmx4g -jar $TOOLS/snpEff/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf

@@ -1,5 +1,7 @@
 /mitopipeline/REFs/*
 /mitopipeline/tools/gatk/*
+/mitopipeline/tools/annovar/*
+/mitopipeline/tools/snpeff/*
 /dist/*
 /mitopipeline/__pycache__/*
 /bin/*
