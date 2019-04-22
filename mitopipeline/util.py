@@ -100,9 +100,10 @@ def make_subdirectories(output, task_names, steps, slurm):
     if slurm:
         os.makedirs(output + "/slurm")
 
+#returns either all of the softwares after gatk or the latest step before or
 def get_wrapper_tasks(task_names, steps, softwares):
-    tasks = list(task_names[step] for step in steps if step in softwares)
     folder_name = 0
+    tasks = list(task_names[step][folder_name] for step in steps if step in softwares)
     if not tasks:
         for task_name in reversed(list(task_names.keys())):
             #return the latest task that is not a software step

@@ -27,6 +27,8 @@ Running Pipeline
     "``-t``, ``---tools``", "| Specifies the location of the folder that contains all of the 3rd party software.
     | **Input**: <path/to/tools/directory>
     | **Default**: <path/to/mitopipeline/tools/directory>"
+    "``-g``, ``--genomes``", "| Specifies location of the folder that contains the human reference genomes. The required genomes for this pipeline are hg38-nochr.fa (the human genome without the mitochondrial genome), hg38.fa (the entire human genome), and rCRS.fa (the human mitochondrial genome). The file names must match the ones listed here so that the steps are able to find the files. You can also download these human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
+    | **Input:** <path/to/REFs/directory>"
     "``-o`` or ``--output``", "| Specifies where to store the output of the pipeline results. Will create folders for each step within the output directory.
     | **Input**: <path/to/output/directory>
     | **Default**: current directory"
@@ -35,6 +37,6 @@ Running Pipeline
     "``-w`` or ``--workers``", "| Specifies the number of workers to use when running the pipeline.
     | **Input**: integer
     | **Default**: 1"
-    "``-r`` or ``--remove``", "| Specifies steps that won't be run in the pipeline. 
+    "``-r`` or ``--remove``", "| Specifies steps that won't be run in the pipeline. The names of the steps are ['extractmito', 'clipping', 'splitgap', 'removenumts', 'gatk', 'snpeff', 'annovar']
     | **Input**: <name of steps> 
     | **Default**: None"

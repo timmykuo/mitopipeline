@@ -24,5 +24,5 @@ def remove_steps(steps):
             steps_to_use.remove(step)
         else:
             raise ValueError(
-                "The requested step to remove doesn't exist in the pipeline")
+                "The requested step to remove, " + step + ", doesn't exist in the pipeline")
     return steps_to_use

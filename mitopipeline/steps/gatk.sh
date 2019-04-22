@@ -1,4 +1,4 @@
-#!/usr/bin/
+#!/bin/bash
 #script.sh
 ###############
 ################
@@ -20,7 +20,7 @@ filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
-java -Xmx8g -jar $TOOLS/picard-tools-1.93/AddOrReplaceReadGroups.jar \
+java -Xmx8g -jar $TOOLS/AddOrReplaceReadGroups.jar \
 I=$BAMS/$1_${filetype}.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
@@ -35,7 +35,7 @@ echo *****done*****
 echo *****Picard Mark Duplicates and RealignerTargetCreator $1*****
 touch $TMPDIR/$1.metricsfile.txt
 
-java -Xmx8g -jar $TOOLS/picard-tools-1.93/MarkDuplicates.jar \
+java -Xmx8g -jar $TOOLS/MarkDuplicates.jar \
 INPUT=$TMPDIR/$1.tcga.sort.2.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.bam \
 METRICS_FILE=$TMPDIR/$1.metricsfile.txt \
@@ -58,7 +58,7 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 --targetIntervals $TMPDIR/$1.tcga.list \
 -o $TMPDIR/$1.tcga.marked.realigned.bam
 
-java -Xmx8g -jar $TOOLS/picard-tools-1.93/FixMateInformation.jar \
+java -Xmx8g -jar $TOOLS/FixMateInformation.jar \
 INPUT=$TMPDIR/$1.tcga.marked.realigned.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 SO=coordinate \
@@ -72,7 +72,7 @@ java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R $REFS/rCRS-MT.fa \
 -o $TMPDIR/$1.recal_data.grp \
---knownSites ./dbsnp/mtONLY.vcf 
+--knownSites $5/dbsnp/mtONLY.vcf 
 echo *****done*****
 
 echo *****PrintReads $1*****
@@ -96,7 +96,7 @@ java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 --pcr_indel_model HOSTILE \
 -minPruning 10 \
 -A StrandAlleleCountsBySample \
---dbsnp ./dbsnp/mtONLY.vcf \
+--dbsnp $5/dbsnp/mtONLY.vcf \
 -mmq 0 \
 -drf DuplicateRead \
 -o $TMPDIR/$1.tcga.snps.vcf

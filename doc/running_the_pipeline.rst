@@ -3,6 +3,10 @@ Running the Pipeline
 
 This section explores details about running the pipeline such as the tools it uses, its requirements, and some suggestions on how to run it. Although some of these options are described in Command Line options, this will delve into more details.
 
+Required Arguments
+------------------
+
+Reference Genomes: With steps such as GATK and RemoveNuMTs, it's necessary to have human reference genomes to align to. 
 Luigi
 -----
 

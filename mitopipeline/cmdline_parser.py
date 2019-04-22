@@ -14,7 +14,7 @@ class CommandLineParser():
 
     def build_and_run(self, steps):
         pipeline_builder = PipelineBuilder()
-        pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.refs)
+        pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes)
         PipelineRunner.run(self.__opts)
         # if not opts.save:
         #     PipelineRunner.cleanup()
@@ -24,7 +24,7 @@ class CommandLineParser():
         #required arguments
         required_args = parser.add_argument_group('required arguments')
         required_args.add_argument('-s', '--directory', help="Path to the directory of files to be run", type=str)
-        required_args.add_argument('-f', '--refs', help="Path of location of reference genomes", default=None)
+        required_args.add_argument('-g', '--genomes', help="Path of location of reference genomes", default=None)
         #optional arguments
         parser.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages")
         parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)

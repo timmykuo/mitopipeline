@@ -1,4 +1,5 @@
 /mitopipeline/REFs/*
+/mitopipeline/tools/gatk/*
 /dist/*
 /mitopipeline/__pycache__/*
 /bin/*

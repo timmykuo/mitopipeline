@@ -14,7 +14,8 @@ class Downloader:
         self.downloads = {'snpeff': 'http://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip/download',
                         'annovar': 'None',
                         'gatk': 'https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.1-1-g07a4bf8',
-                        'samtools': 'https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2',
+                        #'samtools': 'https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2',
+                        'samtools': 'git clone https://github.com/samtools/samtools.git',
                         'bwa': 'git clone https://github.com/lh3/bwa.git',
                         'bam2fastq': 'git clone --recursive https://github.com/jts/bam2fastq',
                         'seqtk': 'git clone https://github.com/lh3/seqtk.git',
@@ -34,7 +35,7 @@ class Downloader:
                 print('Checking if ' + software + ' is already downloaded...' )
                 if software == 'samtools' or software == 'bwa' and not is_downloaded(software, tools):
                     print(software + ' is not available on the command line. Starting download...')
-                    self.download(software, tools)
+                    self.download(software, TOOLS)
                 elif tools:
                     #if tools directory specified, copy from TOOLS over to tools if it already exists
                     if in_root_folder(software):
@@ -65,30 +66,47 @@ class Downloader:
             raise ValueError('The software annovar needs registration to be downloaded. You can register here: http://www.openbioinformatics.org/annovar/annovar_download_form.php')
                 
     def git_clone(self, software, command, tools):
-        subprocess.call(['cd', tools])
-        subprocess.call([command])
-        subprocess.call(['cd', software])
-        make = True
-        #if make install command is unavailable (samtools)
-        try:
-            subprocess.check_output(['make', 'install'])
-            make = False
-        except subprocess.CalledProcessError:
-            print("make install command unavailable. Attempting to make " + software)
-            subprocess.check_output(['make'])
+        with cd(str(tools)):
+            subprocess.call(command.split(" "))
+            os.chdir(str(software))
             make = True
-
-        #move to /usr/local/bin for command line usage
-        if make and is_exe(tools + "/" + software + "/" + software) and platform.system() == 'Darwin':
-            print("Downloaded successfully and make successfully. Looks like you\'re using a Mac. Requesting permission to copy " + software + " executable over to /usr/local/bin...")
+            #if make install command is unavailable (samtools)
             try:
-                subprocess.check_output(['sudo', 'mv', software, '/usr/local/bin'])
-            except subprocess.CalledProcessError as e:
-                print(e.output)
-                print("Try downloading " + software + " manually.")
+                subprocess.check_output(['make', 'install'])
+                make = False
+            except subprocess.CalledProcessError:
+                print("make install command unavailable. Attempting to make " + software)
+                subprocess.check_output(['make'])
+                make = True
 
-          
+            #move to /usr/local/bin for command line usage
+            if make and is_exe(tools + "/" + software + "/" + software) and platform.system() == 'Darwin':
+                print("Downloaded successfully and make successfully. Looks like you\'re using a Mac. Requesting permission to copy " + software + " executable over to /usr/local/bin...")
+                try:
+                    subprocess.check_output(['sudo', 'mv', software, '/usr/local/bin'])
+                except subprocess.CalledProcessError as e:
+                    print(e.output)
+                    print("Try downloading " + software + " manually.")
+
+    #TODO write download code for each kind of file, i.e. .zip, .tar, git clone, etc
+    #def download_zip():
+    #def download_tar():
+    #def download_gitclone():
+    #def download_jar():
     def download_link(self, software, url):
         # Download the file from `url` and save it locally under `file_name`:
         with urllib.request.urlopen(url) as response, open(str(software), 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
+
+
+class cd:
+    """Context manager for changing the current working directory"""
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)

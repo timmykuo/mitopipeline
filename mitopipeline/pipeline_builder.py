@@ -7,7 +7,7 @@ class PipelineBuilder():
     def __init__(self):
         self.FOLDER_NAME = 0
         self.EXTENSION = 1
-        self.softwares = ['gatk', 'snpeff', 'annovar', 'haplogrep']
+        self.softwares = ['gatk', 'snpeff', 'annovar']
         self.task_template_info = {'extractmito': ['ExtractMito', 'extractmito.bam'],
                             'splitgap': ['SplitGap', 'splitgap.fastq'],
                             'clipping': ['Clipping', 'clipping.fastq'],
@@ -16,37 +16,39 @@ class PipelineBuilder():
                             'gatk': ['GATK', 'gatk.vcf'],
                             'snpeff': ['SNPEFF', 'snpeff.eff'],
                             'annovar': ['ANNOVAR', ''],
-                            'haplogrep': ['HAPLOGREP', ''],
                             #for empty prevstep
                             '': ['', '']}
         self.dependencies = {'snpeff': ['snpeff'],
                         'annovar': ['annovar'],
-                        'gatk': ['gatk', 'picard', 'rCRS'],
-                        'removenumts': ['samtools', 'bwa', 'rCRS', 'hg38-nocrs'],
+                        'gatk': ['GenomeAnalysisTK.jar'],
+                        'removenumts': ['samtools', 'bwa'],
                         'clipping': ['samtools', 'bwa', 'bedtools', 'seqtk'],
                         'extractmito': ['samtools'],
                         'splitgap': ['samtools']}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
-        tools_loc = get_tools_loc(tools, steps, self.dependencies)
-        return self.build_from_template(directory, steps, slurm, output, tools_loc, refs)
+        #tools_loc = get_tools_loc(tools, steps, self.dependencies)
+        return self.build_from_template(directory, steps, slurm, output, tools, refs)
 
-    def build_from_template(self, directory, steps, slurm, output, tools_loc, refs):
+    def build_from_template(self, directory, steps, slurm, output, tools, refs):
         #user specified output or stored within mitopipeline directory
         output = output if output else "./pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, self.task_template_info, steps, slurm)
         with open('./pipeline.py', 'w') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
-            pipeline.write(paths_template.render(directory=directory, output=output, refs=refs) + "\n\n")
+            pipeline.write(paths_template.render(directory=directory, output=output, tools=tools, refs=refs) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_template_info, steps, self.softwares)) + "\n")
             prev_step = ""
             #write in the steps requested into the pipeline
             for step in steps:
                 #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
-                if 'splitgap' not in steps and step == 'removenumts':
-                    job_name = 'remove_numts_no_split_gap.sh'
+                if 'splitgap' not in steps:
+                    if step == 'removenumts':
+                        job_name = 'remove_numts_no_split_gap.sh'
+                    if step == 'gatk':
+                        job_name = 'gatk_nosplitgap.sh'
                 #step only is name of the step, not the name of the script
                 else:
                     job_name = step + ".sh"
