@@ -25,8 +25,8 @@ class CommandLineParser():
         required_args = parser.add_argument_group('required arguments')
         required_args.add_argument('-s', '--directory', help="Path to the directory of files to be run", type=str)
         required_args.add_argument('-g', '--genomes', help="Path of location of reference genomes", default=None)
+        required_args.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages", default=None)
         #optional arguments
-        parser.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages")
         parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)
         parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step", default=False, action='store_true')
         parser.add_argument('-d', '--download', help="Specify softwares you want to download", default=False, action='store_true')

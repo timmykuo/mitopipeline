@@ -16,7 +16,7 @@ echo .
 echo .
 echo .
 echo ----bam2fastq
-$TOOLS/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
+$TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
 echo ****BAM2FASTQ DONE.
 echo .
 echo .
@@ -30,12 +30,12 @@ if [ -e "$OUT/$1_bam2fastq_1.fastq" ]
 then
 echo "PAIRED-END"
         echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_1.fastq > $OUT/$1_1.fastq
-        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_2.fastq > $OUT/$1_2.fastq
+        $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_1.fastq > $OUT/$1_1.fastq
+        $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_2.fastq > $OUT/$1_2.fastq
 else
 echo "SINGLE-END"
         echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-        $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq.fastq > $OUT/$1.fastq
+        $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq.fastq > $OUT/$1.fastq
 fi
 echo ****Clipping DONE.
 echo .

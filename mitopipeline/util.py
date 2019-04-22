@@ -12,9 +12,9 @@ def correct_format(f):
 
 #checks that directory exists and mito directory contains the "steps" folder
 def is_valid_directories(directory, tools, refs, steps, softwares):
-    if not os.path.isdir(directory):
+    if not os.path.isdir(str(directory)):
         raise ValueError('Building the pipeline requires a file/directory to run on')
-    if not os.path.isdir(refs) and ("gatk" in steps or "removenumts" in steps):
+    if not os.path.isdir(str(refs)) and ("gatk" in steps or "removenumts" in steps):
         raise ValueError('GATK and RemoveNuMTs steps require a directory for the reference genomes')
     
 #checks that the file format follows our naming convenction
@@ -50,9 +50,9 @@ def get_loc(software, tools_dir):
         elif is_downloaded(software, tools_dir + "/" + software):
             return tools_dir + "/" + software
         else:
-            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in the specified tools directory")
+            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in " + tools_dir + "/" + software)
     else:
-        raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable")
+        raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable in <path/to/tools_dir/" + software + "/>")
 
 
 def is_exe(fpath):

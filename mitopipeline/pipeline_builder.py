@@ -15,10 +15,10 @@ class PipelineBuilder():
                             'downsample': ['Downsample', 'downsample.bam'],
                             'gatk': ['GATK', 'gatk.vcf'],
                             'snpeff': ['SNPEFF', 'snpeff.eff'],
-                            'annovar': ['ANNOVAR', ''],
+                            'annovar': ['ANNOVAR', 'annovar.avoutput'],
                             #for empty prevstep
                             '': ['', '']}
-        self.dependencies = {'snpeff': ['snpeff'],
+        self.dependencies = {'snpeff': ['snpEff'],
                         'annovar': ['annovar'],
                         'gatk': ['GenomeAnalysisTK.jar'],
                         'removenumts': ['samtools', 'bwa'],

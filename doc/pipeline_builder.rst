@@ -10,7 +10,8 @@ If you decide to use the `-l` (slurm) option, then each file that is run on each
 Extract Mito
 ------------
 
-Requirements: samtools
+| **REQUIRED** 
+| **Tools from command line:** samtools
 
 .. code:: bash
 
@@ -26,15 +27,15 @@ This snippet extracts the mitochondrial genome from the bam file that was passed
 Clipping
 --------
 
-Requirements: samtools, bwa, bam2fastq, seqtk
+| **REQUIRED**
+| **Tools from command line:** samtools, bwa
+| **Tools from tools directory:** bam2fastq, seqtk
 
-The clipping step takes in as input a bam file, either from the mitochondrial bam file extracted from the previous step, or as a starting point. 
-
-First, it changes the bam file into a fastq format:
+The clipping step takes in as input a bam file, either from the mitochondrial bam file extracted from the previous step, or as a starting point. First, it changes the bam file into a fastq format:
 
 .. code:: bash
 
-    $TOOLS/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
+    $TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
 
 Then, depending on if it's a paired end or single end, will trim the first and last two pairs from every read.
 
@@ -44,12 +45,12 @@ Then, depending on if it's a paired end or single end, will trim the first and l
     then
     echo "PAIRED-END"
             echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-            $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_1.fastq > $OUT/$1_1.fastq
-            $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_2.fastq > $OUT/$1_2.fastq
+            $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_1.fastq > $OUT/$1_1.fastq
+            $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq_2.fastq > $OUT/$1_2.fastq
     else
     echo "SINGLE-END"
             echo "--CLIPPED: Removing first and last 2 base pairs from every read"
-            $TOOLS/seqtk-master/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq.fastq > $OUT/$1.fastq
+            $TOOLS/seqtk/seqtk trimfq -b 2 -e 2 $OUT/$1_bam2fastq.fastq > $OUT/$1.fastq
     fi
 
 The output of this step will be $filename.fastq or $filename_1.fastq and $filename_2.fastq, depending on if it's a paired end read or not.
@@ -57,7 +58,8 @@ The output of this step will be $filename.fastq or $filename_1.fastq and $filena
 SplitGap
 --------
 
-Requirements: samtools 
+| **REQUIRED** 
+| **Tools from command line:** samtools 
 
 This step is particularly for Complete Genomics data. Complete Genomics uses a technique called `DNA Nanoball Sequencing <https://en.wikipedia.org/wiki/DNA_nanoball_sequencing>`_. 
 
@@ -88,7 +90,10 @@ Although this does decrease the read size since they are being split, the qualit
 Remove NuMTs
 ------------
 
-Requirements: samtools, bwa, bam2fastq, hg38 mitochondrial reference genome (rCRS-MT.fa), hg38 human genome without mitochondrial genome (hg38-norcrs.fa), and hg38 human genome (hg38.fa)
+| **REQUIRED**
+| **Tools from command line:** samtools, bwa
+| **Tools from tools directory:** bam2fastq
+| **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa), hg38 human genome without mitochondrial genome (hg38-norcrs.fa), and hg38 human genome (hg38.fa)
 
 `NuMTs <https://en.wikipedia.org/wiki/NUMT>`_ are DNA sequences harbored in the nuclear genome, but closely resemble sequences in the mitochondrial genome. We remove these as quality control and to reduce noise in the following steps. The output of this step is a bam file with NuMTs removed
 
@@ -97,7 +102,9 @@ To do this, we first align our input fastq files to both the mitochondrial genom
 GATK
 ----
 
-Requirements: gatk-3.1, picard, hg38 mitochondrial reference genome (rCRS-MT.fa)
+| **REQUIRED** 
+| **Tools from tools directory:** gatk.jar
+| **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa)
 
 The gatk script were adapted from the suggested pipeline by GATK. In particular, the following steps are run in order:
 
@@ -126,7 +133,8 @@ Something important to note is that the gatk.jar executable must be placed withi
 SNPEFF
 ------
 
-Requirements: snpEff
+| **REQUIRED**
+| **Tools from tools directory:** snpEff.jar
 
 This use's snpeff's most basic command and using the most recent mitochondrial reference genome GRCh38.86
 
@@ -139,7 +147,8 @@ This is the standard usage of snpEff. You can read more about it on their websit
 ANNOVAR
 -------
 
-Requirements: Annovar
+| **REQUIRED**
+| **Tools from tools directory:** Annovar's convert2annovar.pl, Annovar's table_annovar.pl
 
 Annovar can only be downloaded after registering on their `website <http://www.openbioinformatics.org/annovar/annovar_download_form.php>`_.
 
