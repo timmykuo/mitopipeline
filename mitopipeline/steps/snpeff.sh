@@ -10,6 +10,11 @@ VCFS=$2
 SNPEFF=$3"/snpEff"
 TOOLS=$4
 #last string following / delimeter will be name of the previous job
-filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+#only set filetype if the value was a step in the pipeline
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+if [ "$filetype" != "gatk" ];
+then
+filename=""
+fi
 
-java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpEff.vcf

@@ -13,7 +13,7 @@ filename=$1
 #last string following / delimeter will be name of the previous job
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
 #if this is the first step in the pipeline
-if [ "$filetype" != "extractmito" ];
+if [ "$filetype" != "_extractmito" ];
 then
 filetype=""
 fi

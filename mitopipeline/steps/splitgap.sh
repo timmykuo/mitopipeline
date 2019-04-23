@@ -6,11 +6,13 @@
 # $5: setup directory
 BAMS=$2
 #last string following / delimeter will be name of the previous job
+#only set filetype if the value was a step in the pipeline
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
-if [ "$filetype" != "extractmito" ] || [ $filetype != "clipping"];
+if [ "$filetype" != "_extractmito" ] || [ $filetype != "_clipping" ];
 then
 filetype=""
 fi
+
 #old fastq file used by split_bams.py
 samtools fastq $BAMS/$1${filetype}.bam -n > $3/$1_old.fastq
 

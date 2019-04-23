@@ -16,9 +16,10 @@ REFS=$6
 TOOLS=$4
 STEPS=$5
 #### $2 is the OUT DIR where you want the final.vcf file to be saved.
+#only set filetype if the value was a step in the pipeline
 #last string following / delimeter will be name of the previous job
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
-if [ "$filetype" != "extractmito" ] || [ "$filetype" != "clipping"] || [ "$filetype" != "splitgap"] || [ "$filetype" != "removenumts"];
+if [ "$filetype" != "_extractmito" ] || [ "$filetype" != "_clipping" ] || [ "$filetype" != "_splitgap" ] || [ "$filetype" != "_removenumts" ];
 then
 filetype=""
 fi
