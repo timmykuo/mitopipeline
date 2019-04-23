@@ -10,7 +10,7 @@ class PipelineBuilder():
         self.softwares = ['gatk', 'snpeff', 'annovar']
         self.task_template_info = {'extractmito': ['ExtractMito', 'extractmito.bam'],
                             'splitgap': ['SplitGap', 'splitgap.fastq'],
-                            'clipping': ['Clipping', 'clipping.fastq'],
+                            'clipping': ['Clipping', '1_clipping.fastq'],
                             'removenumts': ['RemoveNuMTs', 'removenumts.bam'],
                             'downsample': ['Downsample', 'downsample.bam'],
                             'gatk': ['GATK', 'gatk.vcf'],
@@ -43,15 +43,14 @@ class PipelineBuilder():
             prev_step = ""
             #write in the steps requested into the pipeline
             for step in steps:
+                #step only is name of the step, not the name of the script
+                job_name = step + ".sh"
                 #if Complete Genomics data, i.e., did split gap then pipeline requires different scripts with shorter reads due to splitting into multiple reads at the gap
                 if 'splitgap' not in steps:
                     if step == 'removenumts':
                         job_name = 'remove_numts_no_split_gap.sh'
                     if step == 'gatk':
                         job_name = 'gatk_nosplitgap.sh'
-                #step only is name of the step, not the name of the script
-                else:
-                    job_name = step + ".sh"
                 pipeline.write(self.get_template(slurm, prev_step, job_name, step))
                 if "gatk" in step or step not in self.softwares:
                     prev_step = step

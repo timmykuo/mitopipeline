@@ -24,9 +24,4 @@ python $5/split_bams.py $3 $1
 #remove bam txt + old fastq file
 rm $3/$1_bam.txt
 rm $3/$1_old.fastq
-if [ ! -s $3/$1_splitgap.fastq ]
-then
-    rm $3/$1_splitgap.fastq
-    echo "Error: result of splitting the gap was an empty fastq file. Check that samtools is able to be run from the command line"
-    exit 1
-fi
+mv $3/$1_splitgap.fastq $3/$1_1_splitgap.fastq

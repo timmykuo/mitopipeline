@@ -26,4 +26,5 @@ perl $TOOLS/table_annovar.pl $ANNOVAR/$1.avinput $TOOLS/humandb/ -remove -protoc
 rm $ANNOVAR/$1.vcf
 rm $ANNOVAR/$1.avinput
 rm $ANNOVAR/$1_annovar.avoutput
+mv $ANNOVAR/$1.avinput.hg38_multianno.txt $ANNOVAR/$1_avinput.hg38_multianno.txt
 

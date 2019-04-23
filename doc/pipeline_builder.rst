@@ -11,6 +11,7 @@ Extract Mito
 ------------
 
 | **REQUIRED** 
+| **Input:** bam file
 | **Tools from command line:** samtools
 
 .. code:: bash
@@ -22,12 +23,46 @@ Extract Mito
     grep -i SN:chrM $START/$FILENAME.header.bam > $START/$FILENAME.chrM.bam
     grep -i SN:M $START/$FILENAME.header.bam > $START/$FILENAME.M.bam
 
-This snippet extracts the mitochondrial genome from the bam file that was passed in where ``$START`` is the directory that contains the bam files and ``$FILENAME`` is the filename. Since the mitochondrial genome can have different notations based on which reference genome it was aligned to, the script takes into account all the different mitochondrial genome tags.
+This snippet extracts the mitochondrial genome from the bam file that was passed in where ``$START`` is the directory that contains the bam files and ``$FILENAME`` is the filename. Since the mitochondrial genome can have different notations based on which reference genome it was aligned to, the script takes into account all the different mitochondrial genome tags. Output is a bam file.
+
+SplitGap
+--------
+
+| **REQUIRED** 
+| **Input:** bam file
+| **Tools from command line:** samtools 
+
+This step is particularly for Complete Genomics data. Complete Genomics uses a technique called `DNA Nanoball Sequencing <https://en.wikipedia.org/wiki/DNA_nanoball_sequencing>`_. 
+
+The downside to this technique is that each read ends up having a 'gap' in the middle of the read that doesn't match to the reference genome. For example, a reference genome read of 'ATCGA' on a DNA Nanoball Sequencing read could be 'ATA' where the cigar string would be 2M2N1M. To fix this, we use the sam file's format `cigar string <https://www.drive5.com/usearch/manual/cigar.html/>`_ to split the read where the matches are into two reads. So the previous examples reads would be split into 'AT' and 'A' with 2M and 1M being their respective cigar strings.
+
+.. code:: python
+
+    #regex matches any amount of numbers followed by one capital letter
+    matches = re.findall(r'[0-9]+[A-Z]{1}', cigar)
+    curr_num = 0
+    temp_idx = 0
+    let = ""
+    for match in matches:
+        num = int(match[:-1])
+        let = match[-1]
+        #append next reads and quals if not an M or an I
+        if let != 'M' or let != 'I' and curr_num != 0:
+            add_next_seq(temp_idx, curr_num, new_reads, reads, new_quals, quals)
+            temp_idx += curr_num
+            curr_num = 0
+        else:
+            curr_num += num
+
+The above code block finds all cigar blocks, i.e. any number followed by a capital letter like 1M, 5N, 40I, etc.  It then appends on the next reads only if the letter is not an M or an I, which are the reads that match up to the reference genome.
+
+Although this does decrease the read size since they are being split, the quality of the reads drastically improve. Output is a bam file.
 
 Clipping
 --------
 
 | **REQUIRED**
+| **Input:** bam file
 | **Tools from command line:** samtools, bwa
 | **Tools from tools directory:** bam2fastq, seqtk
 
@@ -55,54 +90,24 @@ Then, depending on if it's a paired end or single end, will trim the first and l
 
 The output of this step will be $filename.fastq or $filename_1.fastq and $filename_2.fastq, depending on if it's a paired end read or not.
 
-SplitGap
---------
-
-| **REQUIRED** 
-| **Tools from command line:** samtools 
-
-This step is particularly for Complete Genomics data. Complete Genomics uses a technique called `DNA Nanoball Sequencing <https://en.wikipedia.org/wiki/DNA_nanoball_sequencing>`_. 
-
-The downside to this technique is that each read ends up having a 'gap' in the middle of the read that doesn't match to the reference genome. For example, a reference genome read of 'ATCGA' on a DNA Nanoball Sequencing read could be 'ATA' where the cigar string would be 2M2N1M. To fix this, we use the sam file's format `cigar string <https://www.drive5.com/usearch/manual/cigar.html/>`_ to split the read where the matches are into two reads. So the previous examples reads would be split into 'AT' and 'A' with 2M and 1M being their respective cigar strings.
-
-.. code:: python
-
-    #regex matches any amount of numbers followed by one capital letter
-    matches = re.findall(r'[0-9]+[A-Z]{1}', cigar)
-    curr_num = 0
-    temp_idx = 0
-    let = ""
-    for match in matches:
-        num = int(match[:-1])
-        let = match[-1]
-        #append next reads and quals if not an M or an I
-        if let != 'M' or let != 'I' and curr_num != 0:
-            add_next_seq(temp_idx, curr_num, new_reads, reads, new_quals, quals)
-            temp_idx += curr_num
-            curr_num = 0
-        else:
-            curr_num += num
-
-The above code block finds all cigar blocks, i.e. any number followed by a capital letter like 1M, 5N, 40I, etc.  It then appends on the next reads only if the letter is not an M or an I, which are the reads that match up to the reference genome.
-
-Although this does decrease the read size since they are being split, the quality of the reads drastically improve.
-
 Remove NuMTs
 ------------
 
 | **REQUIRED**
+| **Input:** fastq file(s)
 | **Tools from command line:** samtools, bwa
 | **Tools from tools directory:** bam2fastq
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa), hg38 human genome without mitochondrial genome (hg38-norcrs.fa), and hg38 human genome (hg38.fa)
 
 `NuMTs <https://en.wikipedia.org/wiki/NUMT>`_ are DNA sequences harbored in the nuclear genome, but closely resemble sequences in the mitochondrial genome. We remove these as quality control and to reduce noise in the following steps. The output of this step is a bam file with NuMTs removed
 
-To do this, we first align our input fastq files to both the mitochondrial genome and hg38 without the mitochondrial genome to find any close matches. Then, we extract the perfect matches to the nuclear genome, realign the resulting fastq file back to hg38 reference genome, and extract the mitochondrial genome. 
+To do this, we first align our input fastq files to both the mitochondrial genome and hg38 without the mitochondrial genome to find any close matches. Then, we extract the perfect matches to the nuclear genome, realign the resulting fastq file back to hg38 reference genome, and extract the mitochondrial genome. Output is bam file.
 
 GATK
 ----
 
 | **REQUIRED** 
+| **Input:** bam file
 | **Tools from tools directory:** gatk.jar
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa)
 
@@ -128,12 +133,13 @@ An example of how gatk is called:
     --dbsnp $5/dbsnp/mtONLY.vcf \
     -o $TMPDIR/$1.tcga.snps.vcf
 
-Something important to note is that the gatk.jar executable must be placed within a folder called gatk within the tool's directory.
+Something important to note is that the gatk.jar executable must be placed within a folder called gatk within the tool's directory. Output is vcf file.
 
 SNPEFF
 ------
 
 | **REQUIRED**
+| **Input:** vcf file
 | **Tools from tools directory:** snpEff.jar
 
 This use's snpeff's most basic command and using the most recent mitochondrial reference genome GRCh38.86
@@ -148,6 +154,7 @@ ANNOVAR
 -------
 
 | **REQUIRED**
+| **Input:** vcf file
 | **Tools from tools directory:** Annovar's convert2annovar.pl, Annovar's table_annovar.pl
 
 Annovar can only be downloaded after registering on their `website <http://www.openbioinformatics.org/annovar/annovar_download_form.php>`_.

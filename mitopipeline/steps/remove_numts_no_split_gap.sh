@@ -5,7 +5,6 @@
 ### $4 is tools directory
 ### $5 is steps directory
 ### $6 is the refs directory
-
 REF=$6
 COUNTS=$3"/counts"
 FASTQS=$3"/fastqs"
@@ -29,11 +28,11 @@ samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 
 #Align $filename _cl--rCRS $REF/rCRS-MT.fa
 function Align {
-if [ -e "$START/$1_1.fastq" ]
+if [ -e "$START/$1_1$filetype.fastq" ]
 then
-bwa mem -t 12 $3 $START/$1_1.fastq $START/$1_2.fastq > $STOR/$1$2.sam
+bwa mem -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
 else
-bwa mem -t 12 $3 $START/$1.fastq > $STOR/$1$2.sam
+bwa mem -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
 fi
 }
 
@@ -41,7 +40,7 @@ fi
 function AlignNUMTS {
 awk 'FNR==NR{a[$1]++;next}!a[$1]' $STOR/$5 $STOR/$2$1.sam > $STOR/$2$1-$6.sam
 samtools view -bS $STOR/$2$1-$6.sam > $STOR/$2$1-$6.bam
-samtools sort $STOR/$2$1-$6.bam $STOR/$2$1-$6.sorted.bam
+samtools sort $STOR/$2$1-$6.bam -o $STOR/$2$1-$6.sorted.bam
 samtools mpileup -B -C 50 -q 40 -Q 30 -f $4 $STOR/$2$1-$6.sorted.bam > $PILEUPS/$2$1-$6.$3
 }
 
@@ -68,7 +67,7 @@ awk '$1==1{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsSingleReads
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i0NUMTsSingleReads $STOR/$2$3i1NUMTsSingleReads > $STOR/$2$3NUMTsDupsReads
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3NUMTsDupsReads $STOR/$2$1 >  $STOR/$2$3NUMTsDups.sam
 
-if [ -e "$START/$2_1.fastq" ]
+if [ -e "$START/$2_1$filetype.fastq" ]
 then
 	echo PAIRED-END, removing all mate pairs which align with up to 1 mismatch to nuclear genome
 	cat $STOR/$2$3i0NUMTs.sam $STOR/$2$3i1NUMTs.sam $STOR/$2$3NUMTsDups.sam > $STOR/$2$3--lowNUMTs.sam
@@ -79,7 +78,7 @@ fi
 }
 
 echo ----bwa alignment to rCRS
-Align $1 _cl--rCRS $REF/rCRS.fa
+Align $1 _cl--rCRS $REF/rCRS-MT.fa
 echo ****bwa alignment to rCRS DONE.
 echo .
 echo .
@@ -88,11 +87,11 @@ echo .
 echo .
 echo .
 echo ----bwa alignment to hg38-norCRS --NUMTs: going to make $1_cl--nuclear.sam
-if [ -e "$START/$1_1.fastq" ]
+if [ -e "$START/$1_1$filetype.fastq" ]
 then
-bwa mem -t 12 $REF/hg38-nochr.fa $START/$1_1.fastq $START/$1_2.fastq > $STOR/$1_cl--nuclear.sam
+bwa mem -t 12 $REF/hg38-nochr.fa $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
 else
-bwa mem -t 12 $REF/hg38-nochr.fa $START/$1.fastq > $STOR/$1_cl--nuclear.sam
+bwa mem -t 12 $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
 fi
 echo ****bwa alignment to hg38-norCRS DONE.
 echo .
@@ -112,7 +111,7 @@ echo .
 echo .
 echo .
 echo ----Generate $1_cl--rCRS-lowNUMTS.pileup
-AlignNUMTS _cl--rCRS $1 pileup $REF/rCRS.fa $1_cl-NM--lowNUMTs.sam lowNUMTs
+AlignNUMTS _cl--rCRS $1 pileup $REF/rCRS-MT.fa $1_cl-NM--lowNUMTs.sam lowNUMTs
 CountReads _cl--rCRS-lowNUMTs $1
 echo ****Generate $1_cl--rCRS-lowNUMTS.pileup DONE.
 echo ****NUMTs DONE.
@@ -154,7 +153,7 @@ echo .
 
 echo ----samtools Started
 samtools view -bS $STOR/$1.mito_hg38.sam > $STOR/$1.mito_hg38.bam
-samtools sort $STOR/$1.mito_hg38.bam $STOR/$1.mito_hg38.sorted.bam
+samtools sort $STOR/$1.mito_hg38.bam -o $STOR/$1.mito_hg38.sorted.bam
 samtools index $SCR/$1.mito_hg38.sorted.bam
 samtools view -b $STOR/$1.mito_hg38.sorted.bam MT > $NEW_BAMS/$1_removenumts.bam
 echo ****samtools DONE.

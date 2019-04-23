@@ -114,8 +114,11 @@ def get_wrapper_tasks(task_names, steps, softwares):
             if task_name not in softwares and task_name in steps:
                 #return the name of function in template instead of the step name
                 return [task_names[task_name][folder_name]]
-    else:
-        return tasks
+    #if snpeff and/or annovar are in tasks
+    elif len(tasks) > 1 and "GATK" in tasks:
+        tasks.remove("GATK")
+    return tasks
+        
 
 
 class cd:

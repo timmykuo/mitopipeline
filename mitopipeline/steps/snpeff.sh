@@ -5,7 +5,6 @@
 # $4 is the tools directory
 # $5 is the steps directory
 # $6 is the refs directory
-
 VCFS=$2
 SNPEFF=$3
 TOOLS=$4

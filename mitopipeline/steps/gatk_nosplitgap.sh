@@ -9,7 +9,6 @@
 #$5 is steps directory
 #$6 is the refs directory
 ##############
-
 TMPDIR=$3"/gatk_stor"
 BAMS=$2
 REFS=$6

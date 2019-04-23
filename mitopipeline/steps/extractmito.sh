@@ -5,7 +5,6 @@
 ### $4 is tools directory
 ### $5 is steps directory
 ### $6 is refs directory
-
 START=$2
 OUT=$3
 TOOLS=$4
