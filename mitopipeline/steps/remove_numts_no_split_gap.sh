@@ -123,7 +123,10 @@ echo .
 echo .
 echo ----BAM2FASTQ $1_cl--rCRS-lowNUMTs.sam Initiated
 samtools view -bS $STOR/$1_cl--rCRS-lowNUMTs.sam > $STOR/$1_cl--rCRS-lowNUMTs.bam
-$TOOLS/bam2fastq-1.1.0/bam2fastq -o $STOR/$1_cl--rCRS-lowNUMTs#.fastq $STOR/$1_cl--rCRS-lowNUMTs.bam
+java -jar $5/tools/SamToFastq.jar \
+I=$STOR/$1_cl--rCRS-lowNUMTs.bam \
+FASTQ=$STOR/$1_cl--rCRS-lowNUMTs.fastq  \
+SECOND_END_FASTQ=$STOR/$1_cl--rCRS-lowNUMTs_2.fastq 
 echo ****BAM2FASTQ DONE.
 echo .
 echo .
@@ -132,12 +135,12 @@ echo .
 echo .
 echo .
 echo ****bwa alignment of $1_cl--rCRS-lowNUMTs fastqs to hg38
-if [ -e "$STOR/$1_cl--rCRS-lowNUMTs_1.fastq" ]
+if [ -e "$STOR/$1_cl--rCRS-lowNUMTs_2.fastq" ]
 then
 echo "PAIRED-END"
-	bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_1.fastq > $STOR/$1_cl--rCRS-lowNUMTs_1.sai
+	bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs_1.sai
 	bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1_cl--rCRS-lowNUMTs_2.sai
-	bwa sampe $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_1.sai $STOR/$1_cl--rCRS-lowNUMTs_2.sai $STOR/$1_cl--rCRS-lowNUMTs_1.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
+	bwa sampe $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_1.sai $STOR/$1_cl--rCRS-lowNUMTs_2.sai $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
 else
 echo "SINGLE-END"
 	bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs.sai

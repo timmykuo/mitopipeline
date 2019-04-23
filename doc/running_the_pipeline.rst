@@ -28,17 +28,7 @@ In this diagram, the first task takes in the data from the database as input and
 Softwares
 ---------
 
-As described in the pipeine steps section, all of the steps have some software requirements in order to be run. There are two options for getting the softwares necessary. 
-
-The first choice is to use the command line option ``-d``. For example, the command
-
-.. code:: console
-
-    $ mitopipeline -d -r annovar snpeff
-
-will download all the necessary software into mitopipeline's tool's directory for all steps except for annovar and snpeff. You can then use the mitopipeline normally.
-
-The second choice is to specify a directory that has all the necessary softwares downloaded. This is only necessary for the step softwares, including GATK, SNPEFF, and ANNOVAR. Keep in mind that mitopipeline will check for the naming convention of the software's folder that contains its executable as the same name as the step i.e. 'gatk' step will look for a folder called 'gatk' within the specified directory for a gatk.jar executable. 
+As described in the pipeine steps section, all of the steps have some software requirements in order to be run. You will need to specify a directory that has all the necessary softwares downloaded. This is only necessary only for the step softwares, including seqtk, GATK, SNPEFF, and ANNOVAR. Keep in mind that mitopipeline will check for the naming convention of the software's folder that contains its executable as the same name as the step i.e. 'gatk' step will look for a folder called 'gatk' within the specified directory for a gatk.jar executable. 
 
 A number of softwares are necessary to be run on the command line as they are called directly through the bash scripts. In particular, 'samtools' and 'bwa' need to be able to be executed through the comand line. On MacOSX/Linux, this can be achieved by either copying the executable to your ``/usr/local/bin`` folder or adding the folder of your executable to your $PATH variable. You can read more about each step's required softwares on the Pipeline Steps page.
 

@@ -1,16 +1,16 @@
 Example - One TARGET Genome File
 ********************************
 
-This section will go through an example of how to run the pipeline step by step assuming that you've gone ahead and installed it through pip.
+This section will go through an example of how to run the pipeline step by step assuming that you've gone ahead and installed it through pip or cloned and setup through git.
 
 Step1 - Establish subdirectories such as starting directory, out directory, REFs, and Tools
 -------------------------------------------------------------------------------------
 
-In the example case, it's located within <path/to/mitopipeline/example>, so depending on where your mitopipeline package is installed, you will have to specify that directory. 
+In the example case, the file we will be using is located within <path/to/mitopipeline/example>, so depending on where your mitopipeline package is installed, you will have to specify that directory. 
 
-In addition, the REFs directory will need to be referenced based on where you have the human reference genomes. The specific steps for when the reference genomes are needed can be found in the Pipeline Steps page. 
+In addition, the REFs directory will need to be referenced based on where you have the `human reference genomes <http://hgdownload.cse.ucsc.edu/downloads.html>`_. The specific steps for when the reference genomes are needed can be found in the Pipeline Steps page. 
 
-This example will also assume that the tools directory with the software package's executables are located will be in the same folder as the start and out folders. Thus, the directories are as follows:
+It's also necessary to specify where the tools directory that contains the softwares needed for each individual step. In my case, the software package's executables are located in the same folder as the start and out folders. Thus, the directories are as follows:
 
 Thus, our following directories to be specified can be relative to the current directory you are in or they can be the full path. In my case, the directories are:
 
@@ -19,7 +19,7 @@ Thus, our following directories to be specified can be relative to the current d
 - tools directory == './tools'
 - genomes directory == '/Users/Timmy/Documents/CWRU/Thesis/mitopipeline/mitopipeline/REFs'
 
-We will be using both annovar, snpeff, and gatk so this assumes that you have 
+Since the example genome file is from Complete Genomics, we won't be clipping the bam files and thus we won't need bam2fastq and seqtk.
 
 - './tools/gatk/gatk.jar'
 - './tools/snpeff/snEff.jar'
@@ -47,4 +47,6 @@ It's also worth noting that we do not specify the number of workers. Since we on
 Step3 - View Output
 -------------------
 
-Once the pipeline has finished running, you will see either a successful or error. You can read the log output to see what parts may have failed and which have succeeded. All output files can be viewed within the specified out directory with subdirectories created for each step.
+Once the pipeline has finished running, you will see either a successful or error. You can read the log output to see what parts may have failed and which have succeeded. All output files can be viewed within the specified out directory with subdirectories created for each step. Here is an example of what a successful output would look like:
+
+.. figure:: https://raw.githubusercontent.com/timmykuo/mitopipeline/master/doc/luigi_success.png

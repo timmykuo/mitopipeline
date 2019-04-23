@@ -1,6 +1,6 @@
 Getting Started
 ---------------
-This project can be downloaded through ``pip install mitopipeline`` to install the latest version of mitopipeline. Or, you can directly clone the repository through ``git clone https://github.com/timmykuo/mitopipeline.git` and running ``python3 setup.py install`` after navigating to the cloned directory. Documentation <https://mitopipeline.readthedocs.io/en/latest/>`_ is hosted through readthedocs.
+This project can be downloaded through ``pip install mitopipeline`` to install the latest version of mitopipeline. Or, you can directly clone the repository through ``git clone https://github.com/timmykuo/mitopipeline.git` and running ``python3 setup.py install`` after navigating to the cloned directory. `Documentation <https://mitopipeline.readthedocs.io/en/latest/>`_ is hosted through readthedocs.
 
 Users will have to download samtools and bwa, ``make`` them, and include the path to the executable in their $PATH variable or copy them to their ``bin`` folder so that they can be run from the command line. Download links for `samtools  <http://www.htslib.org/download/>`_ and `bwa <https://sourceforge.net/projects/bio-bwa/>`_. In addition, 3rd party software packages that they wish to use on their own (such as GATK, ANNOVAR, etc.) need to be downloaded before being able to use them in the pipeline.
 

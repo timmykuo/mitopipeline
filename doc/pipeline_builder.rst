@@ -1,11 +1,9 @@
 Pipeline Steps
 ****************
 
-A number of steps are able to be included within the pipeline that can be controlled through options in the command line. As mentioned on the home page, many of these files were adapted from bash scripts written by Sneha Grandhi. 
+A number of steps are able to be included within the pipeline, and you can control which steps to include through the ``-r`` option on the command line. All of them utilize samtools, bwa or both and thus are necessary to download. In addition, if you decide to use the ``-l`` (slurm) option, then each file that is run on each step of the pipeline will be submitted as a slurm job, provided your server uses lmod.
 
-All of them utilize samtools, bwa or both and thus are necessary to download. This section will explain each step in further detail so you can determine if it's necessary to include within your pipeline. 
-
-If you decide to use the `-l` (slurm) option, then each file that is run on each step of the pipeline will be submitted as a slurm job. Options that you will need to specify are described in the command line options section.
+This section will explain each step in further detail so you can determine if it's necessary to include within your pipeline. 
 
 Extract Mito
 ------------
@@ -96,7 +94,6 @@ Remove NuMTs
 | **REQUIRED**
 | **Input:** fastq file(s)
 | **Tools from command line:** samtools, bwa
-| **Tools from tools directory:** bam2fastq
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa), hg38 human genome without mitochondrial genome (hg38-norcrs.fa), and hg38 human genome (hg38.fa)
 
 `NuMTs <https://en.wikipedia.org/wiki/NUMT>`_ are DNA sequences harbored in the nuclear genome, but closely resemble sequences in the mitochondrial genome. We remove these as quality control and to reduce noise in the following steps. The output of this step is a bam file with NuMTs removed
