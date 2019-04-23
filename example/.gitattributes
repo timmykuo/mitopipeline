@@ -1,1 +1,0 @@
-AML_TARGET-20-PANPKN_14_mito.bam filter=lfs diff=lfs merge=lfs -text
