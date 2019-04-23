@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="mitopipeline",
-    version="0.13",
+    version="1.0",
     packages=['mitopipeline'],
     package_dir={'mitopipeline': 'mitopipeline'},
     py_modules=['mitopipeline'],
