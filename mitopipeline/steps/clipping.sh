@@ -11,12 +11,17 @@ OUT=$3
 TOOLS=$4
 filename=$1
 #last string following / delimeter will be name of the previous job
-filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+#if this is the first step in the pipeline
+if [ "$filetype" != "extractmito" ];
+then
+filetype=""
+fi
 echo .
 echo .
 echo .
 echo ----bam2fastq
-$TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
+$TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1$filetype.bam
 echo ****BAM2FASTQ DONE.
 echo .
 echo .

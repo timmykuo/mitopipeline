@@ -1,4 +1,4 @@
-#!/usr/bin
+#!/bin/bash
 # $1 is filename
 # $2 is start directory
 # $3 is out directory

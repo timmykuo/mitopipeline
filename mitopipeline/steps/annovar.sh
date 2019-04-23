@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #$1 is the fileNAME
 #$2 is the start directory
 #$3 is the out directory

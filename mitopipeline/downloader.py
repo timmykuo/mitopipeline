@@ -1,5 +1,5 @@
 import os, platform, urllib.request, pkg_resources, shutil, subprocess, tarfile
-from mitopipeline.util import is_downloaded, is_exe
+from mitopipeline.util import is_downloaded, is_exe, cd
 TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 class Downloader:
 
@@ -93,20 +93,9 @@ class Downloader:
     #def download_tar():
     #def download_gitclone():
     #def download_jar():
+    #def add_to_command_line():
+    #def add_to_tools():
     def download_link(self, software, url):
         # Download the file from `url` and save it locally under `file_name`:
         with urllib.request.urlopen(url) as response, open(str(software), 'wb') as out_file:
             shutil.copyfileobj(response, out_file)
-
-
-class cd:
-    """Context manager for changing the current working directory"""
-    def __init__(self, newPath):
-        self.newPath = os.path.expanduser(newPath)
-
-    def __enter__(self):
-        self.savedPath = os.getcwd()
-        os.chdir(self.newPath)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.savedPath)

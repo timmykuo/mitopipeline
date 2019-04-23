@@ -28,7 +28,11 @@ def check_file_format(directory):
 #check that all tools required in steps are in the tools directory
 def get_tools_loc(tools_dir, steps, dependencies):
     software_loc = {}
-    softwares = set(dependencies[step] for step in steps)
+    softwares = set()
+    for step in steps:
+        for dep in dependencies[step]:
+            softwares.add(dep)
+
     for software in softwares:
         loc = get_loc(software, tools_dir)
         software_loc[software] = loc
@@ -36,8 +40,11 @@ def get_tools_loc(tools_dir, steps, dependencies):
 
 def get_loc(software, tools_dir):
     #if available from command line
-    if shutil.which(software):
-        return 'command'
+    if (software == 'samtools' or software == 'bwa'):
+        if shutil.which(software):
+            return 'command'
+        else:
+            raise ValueError(software + " is not able to be run from the command line. Please refer to documentation on instructions for how to set up " + software + " or 'module load' it if your server uses Lmod")
     #check if downloaded in mitopipeline's tools directory or subdirectory
     elif is_downloaded(software, TOOLS):
         return TOOLS
@@ -69,7 +76,6 @@ def is_downloaded(program, tools):
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
                 return True
-
     return False
 
 #creates subdirectories for all the requested steps within the specified output directory
@@ -112,3 +118,17 @@ def get_wrapper_tasks(task_names, steps, softwares):
                 return [task_names[task_name][folder_name]]
     else:
         return tasks
+
+
+class cd:
+    """Context manager for changing the current working directory"""
+
+    def __init__(self, newPath):
+        self.newPath = os.path.expanduser(newPath)
+
+    def __enter__(self):
+        self.savedPath = os.getcwd()
+        os.chdir(self.newPath)
+
+    def __exit__(self, etype, value, traceback):
+        os.chdir(self.savedPath)

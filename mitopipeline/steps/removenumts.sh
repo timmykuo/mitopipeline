@@ -15,7 +15,11 @@ PILEUPS=$3"/pileups"
 START=$2
 filename=$1
 #last string following / delimeter will be name of the previous job
-filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+if [ "$filetype" != "extractmito" ] || [ "$filetype" != "clipping"] || [ "$filetype" != "splitgap"];
+then
+filetype=""
+fi
 
 function CountReads {
 samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
@@ -24,8 +28,8 @@ samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 #Align $filename _cl--rCRS $REF/rCRS-MT.fa
 function Align {
 #use bwa aln and samse for shorter sequences, look into options for bwa aln if inaccurate sam files
-bwa aln $3 $START/$1_$filetype.fastq > $STOR/$1_$2.sai
-bwa samse $3 $STOR/$1_$2.sai $START/$1_$filetype.fastq > $STOR/$1$2.sam
+bwa aln $3 $START/$1$filetype.fastq > $STOR/$1_$2.sai
+bwa samse $3 $STOR/$1_$2.sai $START/$1$filetype.fastq > $STOR/$1$2.sam
 }
 
 #AlignNUMTS _cl--rCRS $filename pileup $REF/rCRS-MT.fa $filename_cl -NM--lowNUMTs.sam lowNUMTs
@@ -76,8 +80,8 @@ echo .
 echo .
 echo ----bwa alignment to hg38-norCRS --NUMTs: going to make ${filename}_cl--nuclear.sam
 #use bwa aln and samse for short reads
-bwa aln $REF/hg38-nochr.fa $START/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sai
-bwa samse $REF/hg38-nochr.fa $STOR/${filename}_cl--nuclear.sai $START/${filename}_${filetype}.fastq > $STOR/${filename}_cl--nuclear.sam 
+bwa aln $REF/hg38-nochr.fa $START/${filename}${filetype}.fastq > $STOR/${filename}_cl--nuclear.sai
+bwa samse $REF/hg38-nochr.fa $STOR/${filename}_cl--nuclear.sai $START/${filename}${filetype}.fastq > $STOR/${filename}_cl--nuclear.sam 
 echo ****bwa alignment to hg38-norCRS DONE.
 echo .
 echo .

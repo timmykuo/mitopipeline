@@ -16,7 +16,11 @@ START=$2
 TOOLS=$4
 filename=$1
 #last string following / delimeter will be name of the previous job
-filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+if [ "$filetype" != "extractmito" ] || [ "$filetype" != "clipping"] || [ "$filetype" != "splitgap"];
+then
+filetype=""
+fi
 
 function CountReads {
 samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count

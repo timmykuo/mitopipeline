@@ -17,12 +17,17 @@ TOOLS=$4
 STEPS=$5
 #### $2 is the OUT DIR where you want the final.vcf file to be saved.
 #last string following / delimeter will be name of the previous job
-filetype=$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+#last string following / delimeter will be name of the previous job
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+if [ "$filetype" != "extractmito" ] || [ "$filetype" != "clipping"] || [ "$filetype" != "splitgap"] || [ "$filetype" != "removenumts"];
+then
+filetype=""
+fi
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
 java -Xmx8g -jar $STEPS/tools/AddOrReplaceReadGroups.jar \
-I=$BAMS/$1_${filetype}.bam \
+I=$BAMS/$1${filetype}.bam \
 O=$TMPDIR/$1.tcga.sort.2.bam \
 SORT_ORDER=coordinate \
 RGID=TLL \

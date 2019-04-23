@@ -2,8 +2,8 @@ from mitopipeline.cmdline_parser import CommandLineParser
 from mitopipeline.downloader import Downloader
 #ALL_STEPS = ['extractmito', 'splitgap', 'clipping', 'removenumts', 'downsample',
 #             'gatk', 'snpeff', 'annovar']
-ALL_STEPS = ['extractmito', 'splitgap', 'clipping', 'removenumts',
-             'gatk', 'snpeff', 'annovar']
+ALL_STEPS = ['extractmito', 'splitgap', 'clipping', 'removenumts', 'gatk', 'snpeff', 'annovar']
+
 def run():
     cmdline_parser = CommandLineParser()
     opts = cmdline_parser.parse_commands()

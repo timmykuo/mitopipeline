@@ -22,13 +22,13 @@ class PipelineBuilder():
                         'annovar': ['annovar'],
                         'gatk': ['GenomeAnalysisTK.jar'],
                         'removenumts': ['samtools', 'bwa'],
-                        'clipping': ['samtools', 'bwa', 'bedtools', 'seqtk'],
+                        'clipping': ['samtools', 'bwa', 'bam2fastq', 'seqtk'],
                         'extractmito': ['samtools'],
                         'splitgap': ['samtools']}
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
-        #tools_loc = get_tools_loc(tools, steps, self.dependencies)
+        tools_loc = get_tools_loc(tools, steps, self.dependencies)
         return self.build_from_template(directory, steps, slurm, output, tools, refs)
 
     def build_from_template(self, directory, steps, slurm, output, tools, refs):
@@ -60,7 +60,7 @@ class PipelineBuilder():
     def get_template(self, slurm, prev_step, job_name, step):
         task_name = self.task_template_info[step][self.FOLDER_NAME]
         file_name = self.task_template_info[step][self.EXTENSION]
-        prev_file_name = self.task_template_info[prev_step][self.FOLDER_NAME]
+        prev_task_name = self.task_template_info[prev_step][self.FOLDER_NAME]
         #if slurm job requested
         if slurm:
             #first step in the pipeline has no 'require' function
@@ -68,11 +68,11 @@ class PipelineBuilder():
                 return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_file_name, job_name=job_name, file_name=file_name) + "\n"
+                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_task_name, prev_file_name=prev_step, job_name=job_name, file_name=file_name) + "\n"
         else:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
                 return task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return task_with_req_template.render(task_name=task_name, req_name=prev_file_name, job_name=job_name, file_name=file_name) + "\n"
+                return task_with_req_template.render(task_name=task_name, req_name=prev_task_name, prev_file_name=prev_step, job_name=job_name, file_name=file_name) + "\n"

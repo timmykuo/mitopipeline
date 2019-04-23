@@ -5,11 +5,16 @@
 # $4: tools directory
 # $5: setup directory
 BAMS=$2
-
+#last string following / delimeter will be name of the previous job
+filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
+if [ "$filetype" != "extractmito" ] || [ $filetype != "clipping"];
+then
+filetype=""
+fi
 #old fastq file used by split_bams.py
-samtools fastq $BAMS/$1.bam -n > $3/$1_old.fastq
+samtools fastq $BAMS/$1${filetype}.bam -n > $3/$1_old.fastq
 
-samtools view $BAMS/$1.bam > $3/$1_bam.txt
+samtools view $BAMS/$1${filetype}.bam > $3/$1_bam.txt
 
 #1 is bam file id, 2 is new fastq file to write to
 python $5/split_bams.py $3 $1 
@@ -17,4 +22,9 @@ python $5/split_bams.py $3 $1
 #remove bam txt + old fastq file
 rm $3/$1_bam.txt
 rm $3/$1_old.fastq
-#mv to /mnt/rds/txl80/LaframboiseLab/tyk3/TARGET_PIPELINE/fastqs
+if [ ! -s $3/$1_splitgap.fastq ]
+then
+    rm $3/$1_splitgap.fastq
+    echo "Error: result of splitting the gap was an empty fastq file. Check that samtools is able to be run from the command line"
+    exit 1
+fi
