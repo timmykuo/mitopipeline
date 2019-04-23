@@ -9,7 +9,7 @@ class PipelineBuilder():
         self.EXTENSION = 1
         self.softwares = ['gatk', 'snpeff', 'annovar']
         self.task_template_info = {'extractmito': ['ExtractMito', 'extractmito.bam'],
-                            'splitgap': ['SplitGap', 'splitgap.fastq'],
+                            'splitgap': ['SplitGap', '1_splitgap.fastq'],
                             'clipping': ['Clipping', '1_clipping.fastq'],
                             'removenumts': ['RemoveNuMTs', 'removenumts.bam'],
                             'downsample': ['Downsample', 'downsample.bam'],
