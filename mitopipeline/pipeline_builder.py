@@ -14,13 +14,13 @@ class PipelineBuilder():
                             'removenumts': ['RemoveNuMTs', 'removenumts.bam'],
                             'downsample': ['Downsample', 'downsample.bam'],
                             'gatk': ['GATK', 'gatk.vcf'],
-                            'snpeff': ['SNPEFF', 'snpeff.eff'],
-                            'annovar': ['ANNOVAR', 'annovar.avoutput'],
+                            'snpeff': ['SNPEFF', 'snpeff.vcf'],
+                            'annovar': ['ANNOVAR', 'avinput.hg38_multianno.txt'],
                             #for empty prevstep
                             '': ['', '']}
-        self.dependencies = {'snpeff': ['snpEff'],
-                        'annovar': ['annovar'],
-                        'gatk': ['GenomeAnalysisTK.jar'],
+        self.dependencies = {'snpeff': ['snpEff.jar'],
+                        'annovar': ['table_annovar.pl', 'convert2annovar.pl'],
+                        'gatk': ['gatk.jar'],
                         'removenumts': ['samtools', 'bwa'],
                         'clipping': ['samtools', 'bwa', 'bam2fastq', 'seqtk'],
                         'extractmito': ['samtools'],
@@ -36,7 +36,7 @@ class PipelineBuilder():
         output = output if output else "./pipeline_output"
         check_file_format(directory)
         make_subdirectories(output, self.task_template_info, steps, slurm)
-        with open('./pipeline.py', 'w') as pipeline:
+        with open(output + '/pipeline.py', 'w') as pipeline:
             pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
             pipeline.write(paths_template.render(directory=directory, output=output, tools=tools, refs=refs) + "\n\n")
             pipeline.write(wrapper_task_template.render(task_name="PipelineRunner", yields=get_wrapper_tasks(self.task_template_info, steps, self.softwares)) + "\n")

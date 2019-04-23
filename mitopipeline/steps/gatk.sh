@@ -19,7 +19,7 @@ STEPS=$5
 #only set filetype if the value was a step in the pipeline
 #last string following / delimeter will be name of the previous job
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
-if [ "$filetype" != "_extractmito" ] || [ "$filetype" != "_clipping" ] || [ "$filetype" != "_splitgap" ] || [ "$filetype" != "_removenumts" ];
+if [ "$filetype" != "_extractmito" ] && [ "$filetype" != "_clipping" ] && [ "$filetype" != "_splitgap" ] && [ "$filetype" != "_removenumts" ];
 then
 filetype=""
 fi

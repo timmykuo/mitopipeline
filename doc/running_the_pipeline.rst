@@ -6,6 +6,10 @@ This section explores details about running the pipeline such as the tools it us
 Required Arguments
 ------------------
 
+Start Directory: The start directory is necessary in order to specify where all the files that need to be run are. One thing to note is that the pipeline use's the '.' to parse the file name. Thus, all files within the start directory can only have one period within its name that specifies the extension, i.e. FILENAME.bam.
+
+Tools Directory: In order to run 3rd party softwares like gatk, snpeff, and annovar, mitopipeline requires you to specify where these tools are kept. Each software package should have a folder within the tools directory that contains its executables. For example, gatk's executable should be path/to/tools/gatk/gatk.jar, snpeff's should be path/to/tools/snpeff/snpEff.jar and annovar's should be path/to/tools/annovar/annovar-executables. One choice is to first use mitopipeline's download function if you don't want to download these yourself.
+
 Reference Genomes: With steps such as GATK and RemoveNuMTs, it's necessary to have human reference genomes to align to. The required genomes for this pipeline are `hg38-nochr.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version human genome without the mitochondrial genome), `hg38.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version of the human mitochondrial genome), and `rCRS-MT.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/chromosomes/chrM.fa.gz>`_ (the GRCh38/hg38 version of the human mitochondrial genome). The file names must be changed to match the ones listed here so that the steps are able to find the files. You can read more about the human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
 
 Since the files are too large to be downloaded along with the mitopipeline package, the user must specify the path to the reference genomes after downloading.

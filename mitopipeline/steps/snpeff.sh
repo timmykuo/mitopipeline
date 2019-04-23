@@ -7,7 +7,7 @@
 # $6 is the refs directory
 
 VCFS=$2
-SNPEFF=$3"/snpEff"
+SNPEFF=$3
 TOOLS=$4
 #last string following / delimeter will be name of the previous job
 #only set filetype if the value was a step in the pipeline
@@ -17,4 +17,4 @@ then
 filename=""
 fi
 
-java -Xmx4g -jar $TOOLS/snpEff.jar GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+java -Xmx4g -jar $TOOLS/snpeff/snpEff.jar GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpeff.vcf

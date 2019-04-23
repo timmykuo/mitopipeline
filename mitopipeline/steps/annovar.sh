@@ -17,12 +17,13 @@ if [ "$filetype" != "gatk" ];
 then
 filename=""
 fi
-#sed 's/MT/M/g' $VCFS/$1_$filetype.vcf > $ANNOVAR/$1.vcf
+sed 's/MT/M/g' $VCFS/$1$filetype.vcf > $ANNOVAR/$1.vcf
 
 #convert vcf file to avinput file
-perl $TOOLS/convert2annovar.pl -format vcf4 $VCFS/$1$filetype.vcf  > $ANNOVAR/$1.avinput
+perl $TOOLS/convert2annovar.pl -format vcf4 $ANNOVAR/$1.vcf  > $ANNOVAR/$1.avinput
 
-perl $TOOLS/table_annovar.pl $ANNOVAR/$1.avinput $TOOLS/humandb/ -remove -protocol dbnsfp33a -operation f -build hg38 -nastring . > $3/$1.avoutput
-
-#rm $ANNOVAR/$1.vcf
+perl $TOOLS/table_annovar.pl $ANNOVAR/$1.avinput $TOOLS/humandb/ -remove -protocol dbnsfp33a -operation f -build hg38 -nastring . > $3/$1_annovar.avoutput
+rm $ANNOVAR/$1.vcf
+rm $ANNOVAR/$1.avinput
+rm $ANNOVAR/$1_annovar.avoutput
 

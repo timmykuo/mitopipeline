@@ -35,7 +35,7 @@ The clipping step takes in as input a bam file, either from the mitochondrial ba
 
 .. code:: bash
 
-    $TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1_$filetype.bam
+    $TOOLS/bam2fastq/bam2fastq -f -o $OUT/$1_bam2fastq_#.fastq $START/$1$filetype.bam
 
 Then, depending on if it's a paired end or single end, will trim the first and last two pairs from every read.
 
@@ -140,7 +140,7 @@ This use's snpeff's most basic command and using the most recent mitochondrial r
 
 .. code:: bash
 
-    java -Xmx4g -jar $TOOLS/snpEff/snpEff.jar GRCh38.86 $VCFS/$1_$filetype.vcf > $SNPEFF/$1_snpEff.vcf
+    java -Xmx4g -jar $TOOLS/snpEff/snpEff.jar GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpEff.vcf
 
 This is the standard usage of snpEff. You can read more about it on their website. Also note that the snpEff executable must be placed within a snpEff folder within the tool's directory just like gatk.
 
@@ -155,12 +155,11 @@ Annovar can only be downloaded after registering on their `website <http://www.o
 .. code:: bash
 
     #convert vcf file to avinput file
-    perl $TOOLS/convert2annovar.pl -format vcf4 $VCFS/$1_$filetype.vcf  > $ANNOVAR/$1.avinput
+    perl $TOOLS/convert2annovar.pl -format vcf4 $VCFS/$1$filetype.vcf  > $ANNOVAR/$1.avinput
 
     perl $TOOLS/table_annovar.pl $ANNOVAR/$1.avinput $TOOLS/humandb/ -remove -protocol dbnsfp33a -operation f -build hg38 -nastring . > $3/$1.avoutput
 
-This is the suggested usage from annovar. You can read more about these files on their website. It also uses the hg38 version of the human reference genome.
-
+One thing to note is that you have to first download the -buildver and databases for hg38 through a different script called annotate_variation.pl. You can read more about these files on their `guide <http://annovar.openbioinformatics.org/en/latest/user-guide/startup/>`_.
 
 
 

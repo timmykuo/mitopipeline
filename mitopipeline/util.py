@@ -31,33 +31,31 @@ def get_tools_loc(tools_dir, steps, dependencies):
     softwares = set()
     for step in steps:
         for dep in dependencies[step]:
-            softwares.add(dep)
-
-    for software in softwares:
-        loc = get_loc(software, tools_dir)
-        software_loc[software] = loc
+            if softwares.add(dep):
+                loc = get_loc(step, dep, tools_dir)
+                software_loc[dep] = loc
     return software_loc
 
-def get_loc(software, tools_dir):
+def get_loc(step, software, tools_dir):
     #if available from command line
     if (software == 'samtools' or software == 'bwa'):
         if shutil.which(software):
             return 'command'
         else:
             raise ValueError(software + " is not able to be run from the command line. Please refer to documentation on instructions for how to set up " + software + " or 'module load' it if your server uses Lmod")
-    #check if downloaded in mitopipeline's tools directory or subdirectory
-    elif is_downloaded(software, TOOLS):
-        return TOOLS
-    elif is_downloaded(software, TOOLS + "/" + software):
-        return TOOLS + "/" + software
+    # #check if downloaded in mitopipeline's tools directory or subdirectory
+    # elif is_downloaded(software, TOOLS):
+    #     return TOOLS
+    # elif is_downloaded(software, TOOLS + "/" + software):
+    #     return TOOLS + "/" + software
     #check if downloaded in user-specified tools directory or subdirectory
-    elif tools_dir:
+    if tools_dir:
         if is_downloaded(software, tools_dir):
             return tools_dir
-        elif is_downloaded(software, tools_dir + "/" + software):
-            return tools_dir + "/" + software
+        elif is_downloaded(software, tools_dir + "/" + step):
+            return tools_dir + "/" + step
         else:
-            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + software + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in " + tools_dir + "/" + software)
+            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + step + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in " + tools_dir + "/" + step)
     else:
         raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable in <path/to/tools_dir/" + software + "/>")
 

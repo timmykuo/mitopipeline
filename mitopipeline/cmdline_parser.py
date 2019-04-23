@@ -16,8 +16,6 @@ class CommandLineParser():
         pipeline_builder = PipelineBuilder()
         pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes)
         PipelineRunner.run(self.__opts)
-        # if not opts.save:
-        #     PipelineRunner.cleanup()
         
     def _build_parser(self):
         parser = argparse.ArgumentParser()
