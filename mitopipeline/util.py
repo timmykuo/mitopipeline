@@ -61,19 +61,13 @@ def get_loc(step, software, tools_dir):
 
 
 def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-#TODO: double check this function
+#checks if there is an executable called <program> on the tools path
 def is_downloaded(program, tools):
     fpath, fname = os.path.split(tools)
-    if fpath:
-        if is_exe(program):
-            return True
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return True
+    if fpath and is_exe(program):
+        return True
     return False
 
 #creates subdirectories for all the requested steps within the specified output directory
@@ -119,7 +113,13 @@ def get_wrapper_tasks(task_names, steps, softwares):
         tasks.remove("GATK")
     return tasks
         
-
+def which(file):
+    if shutil.which(file):
+        return True
+    for path in os.environ["PATH"].split(os.pathsep):
+        if is_exe(os.path.join(path, file)):
+            return True
+    return False
 
 class cd:
     """Context manager for changing the current working directory"""
