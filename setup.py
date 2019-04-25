@@ -33,16 +33,11 @@ setup(
     license="MIT",
     keywords="genetics research data pipeline dependency management mitochondrial genome",
     url="https://github.com/timmykuo/mitopipeline",
-    download_url="",
+    download_url="https://github.com/timmykuo/mitopipeline/releases/tag/v1.0",
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 1 - Beta',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
     ],
-    project_urls={
-        "Bug Tracker": "",
-        "Documentation": "",
-        "Source Code": "",
-    }
 )

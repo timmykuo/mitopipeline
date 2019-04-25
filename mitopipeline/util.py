@@ -1,5 +1,4 @@
 import os, shutil, pkg_resources, subprocess, sys
-TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 def parse_fid(f):
     #filename is FILENAME.bam i.e.

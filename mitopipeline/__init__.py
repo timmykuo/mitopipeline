@@ -1,1 +1,2 @@
 from mitopipeline.cmdline_parser import CommandLineParser
+from mitopipeline.downloader import Downloader

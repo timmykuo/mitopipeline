@@ -1,15 +1,17 @@
-import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile, requests, io, logging
+import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile, requests, io
 from mitopipeline.util import is_downloaded, is_exe, cd, which, execute, query_yes_no, get_dir_name
+from mitopipeline.logging import Download_Logger
+logger = Download_Logger(__name__)
 TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
-class Downloader:
+class Downloader():
 
     def __init__(self):
         self.msgs = []
         #in case tools folder doesn't exist yet
         if not os.path.isdir(TOOLS):
             os.makedirs(TOOLS)
+        
         self.dependencies = {'snpeff': ['snpEff'],
                                 'annovar': ['annovar'],
                                 'gatk': ['GenomeAnalysisTK'],
@@ -29,22 +31,21 @@ class Downloader:
 
     def download_dependencies(self, steps):
         for step in steps:
-            print('Downloading software dependencies for ' + step + ".....")
+            logger.info('Checking softwar software dependencies for ' + step + "...")
             for software in self.dependencies[step]:
-                print('Checking if ' + software + ' is already downloaded...' )
                 if get_dir_name(software, TOOLS) or get_dir_name(step, TOOLS):
-                    print(software + " is already downloaded in " + TOOLS)
+                    logger.info(software + " is already downloaded in " + TOOLS + ". Skipping download.")
                 elif (software == 'samtools' or software == 'bwa'):
                     if not which(software):
-                        print(software + ' is not available on the command line. Starting download...')
+                        logger.info(software + ' is not available on the command line. Starting download...')
                         self.download(software, TOOLS)
                         dir_name = get_dir_name(software, TOOLS)
                         self.make(software, dir_name)
                         self.add_to_command_line(software, dir_name)
                     else:
-                        print(software + " is available on the command line. Skipping download.")
+                        logger.info(software + " is available on the command line. Skipping download.")
                 else:
-                    print("Downloading " + software + " to mitopipeline's tool directory")
+                    logger.info("Downloading " + software + " to mitopipeline's tool directory")
                     self.download(software, TOOLS)
                     if software == "seqtk":
                         dir_name = get_dir_name(software, TOOLS)
@@ -53,18 +54,13 @@ class Downloader:
                         if not os.path.isdir(TOOLS + "/gatk"):
                             os.makedirs(TOOLS + "/gatk")
                         os.rename(TOOLS + "/GenomeAnalysisTK.jar", TOOLS + "/gatk/GenomeAnalysisTK.jar")
-        if self.msgs:
-            self.print_msgs()
-        else:
-            print("Downloads successful.")
-
 
     def download(self, software, dir):
-        print("Downloading " + software + ". This may take awhile...")
+        logger.info("Downloading " + software + ". This may take awhile...")
         url = self.downloads[software]
         with cd(str(dir)):
             if software == "annovar":
-                self.cache_msg(software, "Annovar must be downloaded through website at " + url)
+                logger.warning("Annovar must be downloaded through website at " + url + " after registration. Skipping download")
             elif 'git clone' in url:
                 self.git_clone(software, url, dir)
             elif 'tar.bz2' in url or software == 'GenomeAnalysisTK':
@@ -80,8 +76,7 @@ class Downloader:
                 for path in execute(link.split(" ")):
                     print(path, end="")
             except subprocess.CalledProcessError as e:
-                print(e)
-                print("git clone unsuccessful")
+                logger.error(e)
                 raise e
 
     def make(self, software, dir):    
@@ -91,28 +86,26 @@ class Downloader:
                 for path in execute(["make"]):
                     print(path, end="")
             except subprocess.CalledProcessError as e:
-                print(e)
-                print("'make' command unavailable. Please attempt this manually through the git cloned directory at " + dir)
+                logger.error("'make' command unavailable. Please attempt this manually through the git cloned directory at " + dir)
                 raise e
 
     def add_to_command_line(self, software, dir):
         with cd(str(dir)):
             #move to /usr/local/bin for command line usage
             if platform.system() == 'Darwin' or platform.system() == 'Linux':
-                print("Downloaded successfully and make successfully. Looks like you\'re using a Unix machine.")
+                logger.info("Downloaded successfully and make successfully. Looks like you\'re using a Unix machine.")
                 if query_yes_no("Permission to copy " + software + " executable over to /usr/local/bin?"):
                     try:
                         subprocess.check_output(['mv', software, '/usr/local/bin'])
                     except subprocess.CalledProcessError as e:
-                        print(e)
-                        print("There was an error moving the executable to your /usr/local/bin folder. Try doing it manually or adding the directory to your $PATH variable. The path to cloned git repository directory is " + TOOLS + "/" + software)
+                        logger.error("There was an error moving the executable to your /usr/local/bin folder. Try doing it manually or adding the directory to your $PATH variable. The path to cloned git repository directory is " + TOOLS + "/" + software)
+                        raise e
                 else:
-                    print("Exiting... " + software + " was downloaded into " + dir)
-            # elif platform.system() == 'Windows':
-            #     #code for windows
-            #     print('Windows')
+                    logger.info("Exiting... " + software + " was downloaded into " + dir)
+            elif platform.system() == 'Windows':
+                logger.warning("Looks like this is a Windows machine. Please download software manually.")
             else:
-                self.cache_msg(software, "Unknown operating system, please download manually.")
+                logger.warning("When trying to add to the command line, this is an unknown operating system. Please download manually.")
 
     #TODO write download code for each kind of file, i.e. .zip, .tar, git clone, etc
     def download_zip(self, url):
@@ -139,10 +132,3 @@ class Downloader:
         tfile.extractall(path=os.getcwd())
         tfile.close()
         tmpfile.close()
-
-    def cache_msg(self, software, msg):
-        self.msgs.append("While downloading " + software + ", the following error occured: " + msg)
-    
-    def print_msgs(self):
-        for msg in self.msgs:
-            print(msg)
