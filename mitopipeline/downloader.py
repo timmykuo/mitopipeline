@@ -1,10 +1,15 @@
-import os, platform, urllib.request, pkg_resources, shutil, subprocess, tarfile, zipfile, requests, io
+import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile, requests, io, logging
 from mitopipeline.util import is_downloaded, is_exe, cd, which, execute, query_yes_no, get_dir_name
 TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+
 class Downloader:
 
     def __init__(self):
         self.msgs = []
+        #in case tools folder doesn't exist yet
+        if not os.path.isdir(TOOLS):
+            os.makedirs(TOOLS)
         self.dependencies = {'snpeff': ['snpEff'],
                                 'annovar': ['annovar'],
                                 'gatk': ['GenomeAnalysisTK'],
