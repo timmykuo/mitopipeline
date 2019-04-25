@@ -5,6 +5,12 @@ from mitopipeline.templates import task_template, task_with_req_template, import
 class PipelineBuilder():
 
     def __init__(self):
+        try:
+            self.TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
+        except KeyError:
+            self.TOOLS = pkg_resources.resource_filename('mitopipeline', "/") + "/tools"
+        if not os.path.isdir(self.TOOLS):
+            os.makedirs(self.TOOLS)
         self.FOLDER_NAME = 0
         self.EXTENSION = 1
         self.softwares = ['gatk', 'snpeff', 'annovar']
@@ -27,7 +33,7 @@ class PipelineBuilder():
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
-        tools = tools if tools else pkg_resources.resource_filename('mitopipeline', "tools")
+        tools = tools if tools else self.TOOLS
         check_tools_exist(tools, steps, self.dependencies)
         return self.build_from_template(directory, steps, slurm, output, tools, refs)
 

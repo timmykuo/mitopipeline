@@ -5,10 +5,9 @@ logger = Download_Logger(__name__)
 
 class Downloader():
 
-
     def __init__(self):
         self.msgs = []
-        #in case tools folder doesn't exist yet
+        #hack to create tools folder in cache
         try:
             self.TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
         except KeyError:
