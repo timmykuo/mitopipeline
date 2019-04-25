@@ -2,15 +2,19 @@ import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile
 from mitopipeline.util import is_downloaded, is_exe, cd, which, execute, query_yes_no, get_dir_name
 from mitopipeline.logging import Download_Logger
 logger = Download_Logger(__name__)
-TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 class Downloader():
+
 
     def __init__(self):
         self.msgs = []
         #in case tools folder doesn't exist yet
-        if not os.path.isdir(TOOLS):
-            os.makedirs(TOOLS)
+        try:
+            self.TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
+        except KeyError:
+            self.TOOLS = pkg_resources.resource_filename('mitopipeline', "/") + "/tools"
+        if not os.path.isdir(self.TOOLS):
+            os.makedirs(self.TOOLS)
         
         self.dependencies = {'snpeff': ['snpEff'],
                                 'annovar': ['annovar'],
@@ -33,27 +37,27 @@ class Downloader():
         for step in steps:
             logger.info('Checking softwar software dependencies for ' + step + "...")
             for software in self.dependencies[step]:
-                if get_dir_name(software, TOOLS) or get_dir_name(step, TOOLS):
-                    logger.info(software + " is already downloaded in " + TOOLS + ". Skipping download.")
+                if get_dir_name(software, self.TOOLS) or get_dir_name(step, self.TOOLS):
+                    logger.info(software + " is already downloaded in " + self.TOOLS + ". Skipping download.")
                 elif (software == 'samtools' or software == 'bwa'):
                     if not which(software):
                         logger.info(software + ' is not available on the command line. Starting download...')
-                        self.download(software, TOOLS)
-                        dir_name = get_dir_name(software, TOOLS)
+                        self.download(software, self.TOOLS)
+                        dir_name = get_dir_name(software, self.TOOLS)
                         self.make(software, dir_name)
                         self.add_to_command_line(software, dir_name)
                     else:
                         logger.info(software + " is available on the command line. Skipping download.")
                 else:
                     logger.info("Downloading " + software + " to mitopipeline's tool directory")
-                    self.download(software, TOOLS)
+                    self.download(software, self.TOOLS)
                     if software == "seqtk":
-                        dir_name = get_dir_name(software, TOOLS)
+                        dir_name = get_dir_name(software, self.TOOLS)
                         self.make(software, dir_name)
                     if software == "GenomeAnalysisTK":
-                        if not os.path.isdir(TOOLS + "/gatk"):
-                            os.makedirs(TOOLS + "/gatk")
-                        os.rename(TOOLS + "/GenomeAnalysisTK.jar", TOOLS + "/gatk/GenomeAnalysisTK.jar")
+                        if not os.path.isdir(self.TOOLS + "/gatk"):
+                            os.makedirs(self.TOOLS + "/gatk")
+                        os.rename(self.TOOLS + "/GenomeAnalysisTK.jar", self.TOOLS + "/gatk/GenomeAnalysisTK.jar")
 
     def download(self, software, dir):
         logger.info("Downloading " + software + ". This may take awhile...")
@@ -98,7 +102,7 @@ class Downloader():
                     try:
                         subprocess.check_output(['mv', software, '/usr/local/bin'])
                     except subprocess.CalledProcessError as e:
-                        logger.error("There was an error moving the executable to your /usr/local/bin folder. Try doing it manually or adding the directory to your $PATH variable. The path to cloned git repository directory is " + TOOLS + "/" + software)
+                        logger.error("There was an error moving the executable to your /usr/local/bin folder. Try doing it manually or adding the directory to your $PATH variable. The path to cloned git repository directory is " + self.TOOLS + "/" + software)
                         raise e
                 else:
                     logger.info("Exiting... " + software + " was downloaded into " + dir)
