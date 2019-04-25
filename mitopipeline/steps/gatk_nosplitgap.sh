@@ -48,7 +48,7 @@ CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
 ASSUME_SORTED=true
 
-java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.bam \
@@ -56,7 +56,7 @@ java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 echo *****done*****
 
 echo *****IndelRealigner and Picard Marking $1*****
-java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T IndelRealigner \
 -I $TMPDIR/$1.tcga.marked.bam \
 -R $REFS/rCRS-MT.fa \
@@ -72,7 +72,7 @@ CREATE_INDEX=true
 echo *****done*****
 
 echo *****BaseRecalibrator $1*****
-java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T BaseRecalibrator \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R $REFS/rCRS-MT.fa \
@@ -81,7 +81,7 @@ java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 echo *****done*****
 
 echo *****PrintReads $1*****
-java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T PrintReads \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
@@ -90,7 +90,7 @@ java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
 echo *****done*****
 
 echo *****HaplotypeCaller $1*****
-java -Xmx10g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -T HaplotypeCaller \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
@@ -106,7 +106,7 @@ java -Xmx10g -jar $TOOLS/gatk/gatk.jar \
 echo *****done*****
 
 echo *****VariantFiltration $1******
-java -Xmx8g -jar $TOOLS/gatk/gatk.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
 -R $REFS/rCRS-MT.fa \
 -T VariantFiltration \
 --variant $TMPDIR/$1.tcga.snps.vcf \

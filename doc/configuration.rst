@@ -35,7 +35,7 @@ Running Pipeline
     | The file names must match the ones listed here so that the steps are able to find the files. You can also download these human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
     | **Input:** <path/to/REFs/directory>"
     "``-t``, ``---tools``", "| **REQUIRED**.
-    | Specifies the location of the folder that contains all of the 3rd party software. The executables must have the same name as the step, i.e. gatk should have an executable within </path/to/tools/gatk> called gatk.jar.
+    | Specifies the location of the folder that contains all of the 3rd party software. The executables must be in a folder with the same name as the software, i.e. gatk should have its default executable within </path/to/tools/gatk> .
     | **Input**: <path/to/tools/directory>
     | **Default**: <path/to/mitopipeline/tools/directory>"
     "``-o`` or ``--output``", "| Specifies where to store the output of the pipeline results. Will create folders for each step within the output directory.

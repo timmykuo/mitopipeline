@@ -16,4 +16,4 @@ then
 filename=""
 fi
 
-java -Xmx4g -jar $TOOLS/snpeff/snpEff.jar GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpeff.vcf
+java -Xmx4g -jar $TOOLS/snpEff/snpEff.jar -c $TOOLS/snpEff/snpEff.config -v GRCh38.86 $VCFS/$1$filetype.vcf > $SNPEFF/$1_snpeff.vcf

@@ -105,7 +105,7 @@ GATK
 
 | **REQUIRED** 
 | **Input:** bam file
-| **Tools from tools directory:** gatk.jar
+| **Tools from tools directory:** GenomeAnalysisTK.jar
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa)
 
 The gatk script were adapted from the suggested pipeline by GATK. In particular, the following steps are run in order:
@@ -116,7 +116,7 @@ An example of how gatk is called:
 
 .. code:: bash
 
-    java -Xmx10g -jar $TOOLS/gatk/gatk.jar \
+    java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
     -T HaplotypeCaller \
     -R $REFS/rCRS-MT.fa \
     -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \

@@ -21,8 +21,8 @@ Thus, our following directories to be specified can be relative to the current d
 
 Since the example genome file is from Complete Genomics, we won't be clipping the bam files and thus we won't need bam2fastq and seqtk.
 
-- './tools/gatk/gatk.jar'
-- './tools/snpeff/snEff.jar'
+- './tools/gatk/GenomeAnalysisTK.jar'
+- './tools/snpeff/snpEff.jar'
 - './tools/annovar/table_annovar.pl'
 - './tools/annovar/convert2annovar.pl'
 - '<path/to/REFs>/hg38-nochr.fa'

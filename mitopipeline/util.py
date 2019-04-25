@@ -26,49 +26,41 @@ def check_file_format(directory):
                 "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
 #check that all tools required in steps are in the tools directory
-def get_tools_loc(tools_dir, steps, dependencies):
-    software_loc = {}
-    softwares = set()
+def check_tools_exist(tools_dir, steps, dependencies):
     for step in steps:
         for dep in dependencies[step]:
-            if softwares.add(dep):
-                loc = get_loc(step, dep, tools_dir)
-                software_loc[dep] = loc
-    return software_loc
+            if not found_loc(dep, tools_dir):
+                raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
 
-def get_loc(step, software, tools_dir):
+def found_loc(software, tools_dir):
     #if available from command line
     if (software == 'samtools' or software == 'bwa'):
         if shutil.which(software):
-            return 'command'
+            return True
         else:
             raise ValueError(software + " is not able to be run from the command line. Please refer to documentation on instructions for how to set up " + software + " or 'module load' it if your server uses Lmod")
-    # #check if downloaded in mitopipeline's tools directory or subdirectory
-    # elif is_downloaded(software, TOOLS):
-    #     return TOOLS
-    # elif is_downloaded(software, TOOLS + "/" + software):
-    #     return TOOLS + "/" + software
-    #check if downloaded in user-specified tools directory or subdirectory
-    if tools_dir:
-        if is_downloaded(software, tools_dir):
-            return tools_dir
-        elif is_downloaded(software, tools_dir + "/" + step):
-            return tools_dir + "/" + step
-        else:
-            raise ValueError("User-specified 'tools' directory doesn't have a folder called " + step + " that contains the software and that software is not available to run from the command line. Please install the required software through -d option or provide its' executable in " + tools_dir + "/" + step)
+    elif 'GenomeAnalysisTK' in software:
+        return is_downloaded(software, tools_dir + "/gatk")
+    elif 'snpEff' in software:
+        return is_downloaded(software, tools_dir + "/snpEff")
     else:
-        raise ValueError("Software not available to run on command line. Please install the required software through -d option or provide a tools directory that contains its' executable in <path/to/tools_dir/" + software + "/>")
+        return is_downloaded(software, tools_dir + "/" + software)
 
+def get_dir_name(software, dir):
+    for name in os.listdir(dir):
+        if os.path.isdir(dir + "/" + name) and software in name:
+            return dir + "/" + name
+    return None
 
 def is_exe(fpath):
-    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+    return os.path.isfile(fpath)
+    # and os.access(fpath, os.X_OK)
 
-#checks if there is an executable called <program> on the tools path
-def is_downloaded(program, tools):
-    fpath, fname = os.path.split(tools)
-    if fpath and is_exe(program):
-        return True
-    return False
+#checks if there is an executable called <program> on the path\
+#software should be the software executable name
+def is_downloaded(software, dir):
+    print(dir + "/" + software)
+    return is_exe(dir + "/" + software)
 
 #creates subdirectories for all the requested steps within the specified output directory
 def make_subdirectories(output, task_names, steps, slurm):

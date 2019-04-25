@@ -49,24 +49,31 @@ samtools mpileup -B -C 50 -q 40 -Q 30 -f $4 $STOR/$2$1-$6.sorted.bam > $PILEUPS/
 #$3 = _cl-NM
 #$4 = _cl--NUMTs.sam
 function lowNUMTS {
+echo .
 grep "NM:i:1" $STOR/$2$1 > $STOR/$2$3
+echo .
 awk '$6==length($10)"M"' $STOR/$2$3 >  $STOR/$2$3--NUMTs.sam
-
+echo .
 awk '{print $1}' $STOR/$2$4 | uniq -c | sort -k1 > $STOR/$2$3i0uniq
+echo .
 awk '{print $1}' $STOR/$2$3--NUMTs.sam | uniq -c | sort -k1 > $STOR/$2$3i1uniq
-
+echo .
 awk '$1==2{print $2}' $STOR/$2$3i0uniq > $STOR/$2$3i0NUMTsReads
+echo .
 awk '$1==2{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsReads
-
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i0NUMTsReads $STOR/$2$1 > $STOR/$2$3i0NUMTs.sam
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i1NUMTsReads $STOR/$2$1 > $STOR/$2$3i1NUMTs.sam
-
+echo .
 awk '$1==1{print $2}' $STOR/$2$3i0uniq > $STOR/$2$3i0NUMTsSingleReads
+echo .
 awk '$1==1{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsSingleReads
-
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i0NUMTsSingleReads $STOR/$2$3i1NUMTsSingleReads > $STOR/$2$3NUMTsDupsReads
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3NUMTsDupsReads $STOR/$2$1 >  $STOR/$2$3NUMTsDups.sam
-
+echo .
 if [ -e "$START/$2_1$filetype.fastq" ]
 then
 	echo PAIRED-END, removing all mate pairs which align with up to 1 mismatch to nuclear genome

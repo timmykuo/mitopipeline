@@ -45,22 +45,27 @@ samtools mpileup -B -C 50 -f $4 $STOR/$2$1-$6.sorted.bam > $PILEUPS/$2$1-$6.$3
 #$3 = _cl-NM
 #$4 = _cl--NUMTs.sam
 function lowNUMTS {
+echo .
 grep "NM:i:1" $STOR/$2$1 > $STOR/$2$3
 awk '$6==length($10)"M"' $STOR/$2$3 > $STOR/$2$3--NUMTs.sam
-
+echo .
 #awk will print first word of each line in the file
 #pipes will match unique lines (and prefix lines by num occurences)  and sort based on the first column in _cl-NM--NUMTS.sam and _cl-NUMTs.sam
 awk '{print $1}' $STOR/$2$4 | uniq -c | sort -k1 > $STOR/$2$3i0uniq
+echo .
 awk '{print $1}' $STOR/$2$3--NUMTs.sam | uniq -c | sort -k1 > $STOR/$2$3i1uniq
-
+echo .
 #if the first word of each line == 2, print the 2nd word of each line
 awk '$1==2{print $2}' $STOR/$2$3i0uniq > $STOR/$2$3i0NUMTsReads
+echo .
 awk '$1==2{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsReads
-
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i0NUMTsReads $STOR/$2$1 > $STOR/$2$3i0NUMTs.sam
+echo .
 awk 'FNR==NR{a[$1]++;next}a[$1]' $STOR/$2$3i1NUMTsReads $STOR/$2$1 > $STOR/$2$3i1NUMTs.sam
-
+echo .
 awk '$1==1{print $2}' $STOR/$2$3i0uniq > $STOR/$2$3i0NUMTsSingleReads
+echo .
 awk '$1==1{print $2}' $STOR/$2$3i1uniq > $STOR/$2$3i1NUMTsSingleReads
 echo SINGLE-END, removing all singlet reads which align with up to 1 mismatch to nuclear genome
 cat $STOR/$2$3i0NUMTsSingleReads $STOR/$2$3i1NUMTsSingleReads > $STOR/$2$3--lowNUMTs.sam
