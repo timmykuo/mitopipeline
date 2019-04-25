@@ -1,7 +1,6 @@
 import os, sys, pkg_resources
 from mitopipeline.util import check_tools_exist, check_file_format, make_subdirectories, is_valid_directories, get_wrapper_tasks
 from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
-TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
 
 class PipelineBuilder():
 
@@ -28,7 +27,7 @@ class PipelineBuilder():
 
     def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
         is_valid_directories(directory, tools, refs, steps, self.softwares)
-        tools = tools if tools else TOOLS
+        tools = tools if tools else pkg_resources.resource_filename('mitopipeline', "tools")
         check_tools_exist(tools, steps, self.dependencies)
         return self.build_from_template(directory, steps, slurm, output, tools, refs)
 
