@@ -39,7 +39,7 @@ The first choice is to use the command line option ``-d``. For example, the comm
 
     $ mitopipeline -d -r annovar snpeff
 
-will download all the necessary software into mitopipeline's tool's directory for all steps except for annovar and snpeff. You can then use the mitopipeline normally.
+will download all the necessary software into mitopipeline's tool's directory for all steps except for annovar and snpeff. You can then use the mitopipeline normally without specifying the tools directory.
 
 The second choice is to specify a directory that has all the necessary softwares downloaded. This is only necessary only for the step softwares, including seqtk, GATK, SNPEFF, and ANNOVAR. Keep in mind that mitopipeline will check for the naming convention of the software's folder that contains its executable as the same name as the step i.e. 'gatk' step will look for a folder called 'gatk' within the specified directory for its executable. 
 
