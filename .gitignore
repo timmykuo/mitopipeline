@@ -1,9 +1,4 @@
 /mitopipeline/REFs/*
-/mitopipeline/tools/gatk/*
-/mitopipeline/tools/annovar/*
-/mitopipeline/tools/snpeff/*
-/mitopipeline/tools/seqtk/*
-/mitopipeline/tools/bam2fastq/*
 /dist/*
 /mitopipeline/__pycache__/*
 /bin/*
