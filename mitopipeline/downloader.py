@@ -110,7 +110,6 @@ class Downloader():
             else:
                 logger.warning("When trying to add to the command line, this is an unknown operating system. Please download manually.")
 
-    #TODO write download code for each kind of file, i.e. .zip, .tar, git clone, etc
     def download_zip(self, url):
         r = requests.get(url)
         z = zipfile.ZipFile(io.BytesIO(r.content))

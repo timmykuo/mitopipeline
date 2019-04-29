@@ -7,7 +7,7 @@ Required Arguments
 ------------------
 
 | **Start Directory:** 
-| The start directory is necessary in order to specify where all the files that need to be run are. One thing to note is that the pipeline use's the '.' to parse the file name. Thus, all files within the start directory can only have one period within its name that specifies the extension, i.e. FILENAME.bam.
+| The start directory is necessary in order to specify where all the files that need to be run are. One thing to note is that the pipeline use's the '.' from the file's extension to parse the file name. Thus, all files within the start directory can only have one period within its name that specifies the extension, i.e. FILENAME.bam.
 
 | **Tools Directory:** 
 | In order to run 3rd party softwares like seqtk, gatk, snpeff, and annovar, mitopipeline requires you to specify where these tools are kept. Each software package should have a folder within the tools directory that contains its executables. For example, gatk's executable should be path/to/tools/gatk/GenomeAnalysisTK.jar, snpeff's should be path/to/tools/snpeff/snpEff.jar and annovar's should be path/to/tools/annovar/annovar-executables. One choice is to first use mitopipeline's download function if you don't want to download these yourself.

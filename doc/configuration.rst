@@ -31,7 +31,7 @@ Running Pipeline
     | The required genomes for this pipeline are: 
     | - hg38-nochr.fa (the human genome without the mitochondrial genome)
     | - hg38.fa (the entire human genome)
-    | - rCRS.fa (the human mitochondrial genome). 
+    | - rCRS-MT.fa (the human mitochondrial genome). 
     | The file names must match the ones listed here so that the steps are able to find the files. You can also download these human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_.
     | **Input:** <path/to/REFs/directory>"
     "``-t``, ``---tools``", "| **REQUIRED**.

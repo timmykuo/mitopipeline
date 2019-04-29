@@ -5,6 +5,7 @@ from mitopipeline.templates import task_template, task_with_req_template, import
 class PipelineBuilder():
 
     def __init__(self):
+        #hack to find tools folder in cache
         try:
             self.TOOLS = pkg_resources.resource_filename('mitopipeline', "tools")
         except KeyError:
