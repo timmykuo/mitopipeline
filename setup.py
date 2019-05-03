@@ -1,8 +1,11 @@
 from setuptools import setup
 
+with open("README.rst", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name="mitopipeline",
-    version="1.0",
+    version="1.0.post1",
     packages=['mitopipeline'],
     package_dir={'mitopipeline': 'mitopipeline'},
     py_modules=['mitopipeline'],
@@ -31,13 +34,15 @@ setup(
     author_email="timykuo@gmail.com",
     description="Mitochondrial Genome Pipeline",
     license="MIT",
+    long_description=long_description,
+    long_description_content_type="text/x-rst",
     keywords="genetics research data pipeline dependency management mitochondrial genome",
     url="https://github.com/timmykuo/mitopipeline",
     download_url="https://github.com/timmykuo/mitopipeline/releases/tag/v1.0",
 
     classifiers=[
-        'Development Status :: 5 - Production',
-        'Environment :: Console'
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
         'Topic :: Sociology :: Genealogy'

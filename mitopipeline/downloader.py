@@ -34,7 +34,7 @@ class Downloader():
 
     def download_dependencies(self, steps):
         for step in steps:
-            logger.info('Checking softwar software dependencies for ' + step + "...")
+            logger.info('Checking software dependencies for ' + step + "...")
             for software in self.dependencies[step]:
                 if get_dir_name(software, self.TOOLS) or get_dir_name(step, self.TOOLS):
                     logger.info(software + " is already downloaded in " + self.TOOLS + ". Skipping download.")
