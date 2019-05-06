@@ -27,9 +27,11 @@ def check_file_format(directory):
 #check that all tools required in steps are in the tools directory
 def check_tools_exist(tools_dir, steps, dependencies):
     for step in steps:
-        for dep in dependencies[step]:
-            if not found_loc(dep, tools_dir):
-                raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
+        #hack to not check annovar dependencies
+        if step != "annovar":
+            for dep in dependencies[step]:
+                if not found_loc(dep, tools_dir):
+                    raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
 
 def found_loc(software, tools_dir):
     #if available from command line
