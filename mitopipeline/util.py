@@ -27,12 +27,14 @@ def check_file_format(directory):
 #check that all tools required in steps are in the tools directory
 def check_tools_exist(tools_dir, steps, dependencies):
     for step in steps:
-        #hack to not check annovar dependencies
-        if step != "annovar":
-            for dep in dependencies[step]:
-                if not found_loc(dep, tools_dir):
-                    raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
+        for dep in dependencies[step]:
+            if not found_loc(dep, tools_dir):
+                raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
 
+#function to check annovar dependencies, can't make it general since the files are specific
+def is_annovar_downloaded(software, tools_dir):
+    return os.path.isfile(tools_dir + "/" + software)
+    
 def found_loc(software, tools_dir):
     #if available from command line
     if (software == 'samtools' or software == 'bwa'):
@@ -44,6 +46,8 @@ def found_loc(software, tools_dir):
         return is_downloaded(software, tools_dir + "/gatk")
     elif 'snpEff' in software:
         return is_downloaded(software, tools_dir + "/snpEff")
+    elif 'annovar' in software:
+        return is_annovar_downloaded(software, tools_dir + "/annovar")
     else:
         return is_downloaded(software, tools_dir + "/" + software)
 
@@ -60,7 +64,6 @@ def is_exe(fpath):
 #checks if there is an executable called <program> on the path\
 #software should be the software executable name
 def is_downloaded(software, dir):
-    print(dir + "/" + software)
     return is_exe(dir + "/" + software)
 
 #creates subdirectories for all the requested steps within the specified output directory

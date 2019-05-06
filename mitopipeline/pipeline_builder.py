@@ -27,7 +27,7 @@ class PipelineBuilder():
                             '': ['', '']}
         self.dependencies = {'snpeff': ['snpEff.jar'],
                              'gatk': ['GenomeAnalysisTK.jar'],
-                             'annovar': [''],
+                             'annovar': ['table_annovar.pl', 'convert2annovar.pl'],
                              'removenumts': ['samtools', 'bwa'],
                              'clipping': ['samtools', 'bwa', 'seqtk'],
                              'extractmito': ['samtools'],
