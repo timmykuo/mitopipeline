@@ -126,8 +126,8 @@ echo .
 echo .
 echo .
 echo ****bwa alignment of ${filename}_cl--rCRS-lowNUMTs fastqs to hg38
-bwa aln $REF/rCRS-MT.fa $STOR/${filename}_cl--rCRS-lowNUMTs.fastq > $STOR/${filename}_cl--rCRS-lowNUMTs.sai
-bwa samse $REF/rCRS-MT.fa $STOR/${filename}_cl--rCRS-lowNUMTs.sai $STOR/${filename}_cl--rCRS-lowNUMTs.fastq > $STOR/${filename}.mito_hg38.sam
+bwa aln $REF/hg38.fa $STOR/${filename}_cl--rCRS-lowNUMTs.fastq > $STOR/${filename}_cl--rCRS-lowNUMTs.sai
+bwa samse $REF/hg38.fa $STOR/${filename}_cl--rCRS-lowNUMTs.sai $STOR/${filename}_cl--rCRS-lowNUMTs.fastq > $STOR/${filename}.mito_hg38.sam
 echo ****bwa DONE.
 echo .
 echo .
@@ -137,9 +137,10 @@ echo .
 echo .
 echo ----samtools Started
 samtools view -bS $STOR/${filename}.mito_hg38.sam > $STOR/${filename}.mito_hg38.bam
-samtools sort $STOR/${filename}.mito_hg38.bam -o $STOR/${filename}.mito_hg38.sorted.bam
+samtools sort $STOR/${filename}.mito_hg38.bam > $STOR/${filename}.mito_hg38.sorted.bam
 samtools index $STOR/${filename}.mito_hg38.sorted.bam
 samtools view -b $STOR/${filename}.mito_hg38.sorted.bam MT > $NEW_BAMS/${filename}_removenumts.bam
+#mv $STOR/$1.mito_hg38.sorted.bam ${NEW_BAMS}/${1}_removenumts.bam
 echo ***** samtools DONE
 echo .
 echo .

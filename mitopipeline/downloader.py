@@ -5,6 +5,8 @@ logger = Download_Logger(__name__)
 
 class Downloader():
 
+    cache = []
+
     def __init__(self):
         self.msgs = []
         #hack to create tools folder in cache
@@ -18,14 +20,15 @@ class Downloader():
         self.dependencies = {'snpeff': ['snpEff'],
                                 'annovar': ['annovar'],
                                 'gatk': ['GenomeAnalysisTK'],
-                                'removenumts': ['samtools', 'bwa'],
-                                'clipping': ['samtools', 'bwa', 'seqtk'],
+                                'removenumts': ['samtools', 'bwa', 'bedtools2'],
+                                'clipping': ['samtools', 'bwa', 'seqtk', 'bedtools2'],
                                 'extractmito': ['samtools'],
                                 'splitgap': ['samtools']}
         self.downloads = {'snpEff': 'http://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip/download',
                           'annovar': 'http://annovar.openbioinformatics.org/en/latest/user-guide/download/',
-                          'GenomeAnalysisTK': 'https://software.broadinstitute.org/gatk/download/auth?package=GATK-archive&version=3.4-46-gbc02625',
+                          'GenomeAnalysisTK': 'https://github.com/broadinstitute/gatk/releases/download/4.1.2.0/gatk-4.1.2.0.zip',
                         'samtools': 'https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2',
+                          'bedtools2': 'https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz',
                         #'samtools': 'git clone https://github.com/samtools/samtools.git',
                         'bwa': 'git clone https://github.com/lh3/bwa.git',
                         'seqtk': 'git clone https://github.com/lh3/seqtk.git'}
@@ -33,30 +36,35 @@ class Downloader():
     #def refs(self, steps):
 
     def download_dependencies(self, steps):
+        logger.info('Tools directory is ' + self.TOOLS)
         for step in steps:
             logger.info('Checking software dependencies for ' + step + "...")
             for software in self.dependencies[step]:
-                if get_dir_name(software, self.TOOLS) or get_dir_name(step, self.TOOLS):
-                    logger.info(software + " is already downloaded in " + self.TOOLS + ". Skipping download.")
-                elif (software == 'samtools' or software == 'bwa'):
-                    if not which(software):
-                        logger.info(software + ' is not available on the command line. Starting download...')
-                        self.download(software, self.TOOLS)
-                        dir_name = get_dir_name(software, self.TOOLS)
-                        self.make(software, dir_name)
-                        self.add_to_command_line(software, dir_name)
+                if software not in self.cache:
+                    if get_dir_name(software, self.TOOLS) or get_dir_name(step, self.TOOLS):
+                        logger.info(software + " is already downloaded in " + self.TOOLS + ". Skipping download.")
+                    elif (software == 'samtools' or software == 'bwa' or software == 'bedtools2'):
+                        if not which(software):
+                            logger.info(software + ' is not available on the command line. Starting download...')
+                            self.download(software, self.TOOLS)
+                            dir_name = get_dir_name(software, self.TOOLS)
+                            self.make(software, dir_name)
+                            self.add_to_command_line(software, dir_name)
+                        else:
+                            logger.info(software + " is available on the command line. Skipping download.")
                     else:
-                        logger.info(software + " is available on the command line. Skipping download.")
-                else:
-                    logger.info("Downloading " + software + " to mitopipeline's tool directory")
-                    self.download(software, self.TOOLS)
-                    if software == "seqtk":
-                        dir_name = get_dir_name(software, self.TOOLS)
-                        self.make(software, dir_name)
-                    if software == "GenomeAnalysisTK":
-                        if not os.path.isdir(self.TOOLS + "/gatk"):
-                            os.makedirs(self.TOOLS + "/gatk")
-                        os.rename(self.TOOLS + "/GenomeAnalysisTK.jar", self.TOOLS + "/gatk/GenomeAnalysisTK.jar")
+                        logger.info("Downloading " + software + " to mitopipeline's tool directory")
+                        self.download(software, self.TOOLS)
+                        if software == "seqtk":
+                            dir_name = get_dir_name(software, self.TOOLS)
+                            self.make(software, dir_name)
+                        if software == "GenomeAnalysisTK":
+                            if not os.path.isdir(self.TOOLS + "/gatk"):
+                                os.makedirs(self.TOOLS + "/gatk")
+                            os.rename(self.TOOLS + "/gatk-4.1.2.0/gatk-package-4.1.2.0-local.jar", self.TOOLS + "/gatk/GenomeAnalysisTK.jar")
+                    self.cache.append(software)
+            logger.info('All software dependencies for ' + step + ' satisfied.')
+        self.cache = []
 
     def download(self, software, dir):
         logger.info("Downloading " + software + ". This may take awhile...")
@@ -66,7 +74,7 @@ class Downloader():
                 logger.warning("Annovar must be downloaded through website at " + url + " after registration. Skipping download")
             elif 'git clone' in url:
                 self.git_clone(software, url, dir)
-            elif 'tar.bz2' in url or software == 'GenomeAnalysisTK':
+            elif 'tar.bz2' in url or 'tar.gz' in url:
                 self.download_tar(url)
             elif 'zip' in url:
                 self.download_zip(url)
@@ -99,7 +107,11 @@ class Downloader():
                 logger.info("Downloaded successfully and make successfully. Looks like you\'re using a Unix machine.")
                 if query_yes_no("Permission to copy " + software + " executable over to /usr/local/bin?"):
                     try:
-                        subprocess.check_output(['mv', software, '/usr/local/bin'])
+                        if software == "bedtools2":
+                            subprocess.check_output(
+                                ['cp', '-a', self.TOOLS + '/' + software + '/bin/', '/usr/local/bin'])
+                        else:
+                            subprocess.check_output(['mv', software, '/usr/local/bin'])
                     except subprocess.CalledProcessError as e:
                         logger.error("There was an error moving the executable to your /usr/local/bin folder. Try doing it manually or adding the directory to your $PATH variable. The path to cloned git repository directory is " + self.TOOLS + "/" + software)
                         raise e
@@ -129,8 +141,10 @@ class Downloader():
 
         #seek back to the beginning of the temporary file.
         tmpfile.seek(0)
-
-        tfile = tarfile.open(fileobj=tmpfile, mode="r:bz2")
+        if "tar.bz2" in url:
+            tfile = tarfile.open(fileobj=tmpfile, mode="r:bz2")
+        else:
+            tfile = tarfile.open(fileobj=tmpfile, mode="r:gz")
         tfile.extractall(path=os.getcwd())
         tfile.close()
         tmpfile.close()

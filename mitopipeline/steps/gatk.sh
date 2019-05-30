@@ -22,7 +22,6 @@ if [ "$filetype" != "_extractmito" ] && [ "$filetype" != "_clipping" ] && [ "$fi
 then
 filetype=""
 fi
-
 echo *****$1*****
 
 echo *****AddOrReplaceReadGroups $1*****
@@ -49,23 +48,8 @@ CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT \
 ASSUME_SORTED=true
 
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--T RealignerTargetCreator \
--R $REFS/rCRS-MT.fa \
--I $TMPDIR/$1.tcga.marked.bam \
--o $TMPDIR/$1.tcga.list
-echo *****done*****
-
-echo *****IndelRealigner and Picard Marking $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--T IndelRealigner \
--I $TMPDIR/$1.tcga.marked.bam \
--R $REFS/rCRS-MT.fa \
---targetIntervals $TMPDIR/$1.tcga.list \
--o $TMPDIR/$1.tcga.marked.realigned.bam
-
 java -Xmx8g -jar $STEPS/tools/FixMateInformation.jar \
-INPUT=$TMPDIR/$1.tcga.marked.realigned.bam \
+INPUT=$TMPDIR/$1.tcga.marked.bam \
 OUTPUT=$TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 SO=coordinate \
 VALIDATION_STRINGENCY=SILENT \
@@ -73,49 +57,40 @@ CREATE_INDEX=true
 echo *****done*****
 
 echo *****BaseRecalibrator $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--T BaseRecalibrator \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar BaseRecalibrator \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
 -R $REFS/rCRS-MT.fa \
--o $TMPDIR/$1.recal_data.grp \
---knownSites $5/dbsnp/mtONLY.vcf 
+-O $TMPDIR/$1.recal_data.grp \
+--known-sites $5/dbsnp/mtONLY.vcf 
 echo *****done*****
 
-echo *****PrintReads $1*****
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--T PrintReads \
+echo *****ApplyBQSR $1*****
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar ApplyBQSR \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.bam \
--BQSR $TMPDIR/$1.recal_data.grp \
--o $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam
+--bqsr-recal-file $TMPDIR/$1.recal_data.grp \
+-O $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam
 echo *****done*****
 
 echo *****HaplotypeCaller $1*****
-java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
--T HaplotypeCaller \
+java -Xmx10g -jar $TOOLS/gatk/GenomeAnalysisTK.jar HaplotypeCaller \
 -R $REFS/rCRS-MT.fa \
 -I $TMPDIR/$1.tcga.marked.realigned.fixed.read.bam \
---maxReadsInRegionPerSample 200 \
---sample_ploidy 100 \
--stand_call_conf 50 \
--stand_emit_conf 10 \
---pcr_indel_model HOSTILE \
--minPruning 10 \
--A StrandAlleleCountsBySample \
+--sample-ploidy 100 \
+--stand-call-conf 50 \
+--pcr-indel-model HOSTILE \
+--min-pruning 10 \
 --dbsnp $5/dbsnp/mtONLY.vcf \
--mmq 0 \
--drf DuplicateRead \
--o $TMPDIR/$1.tcga.snps.vcf
+-O $TMPDIR/$1.tcga.snps.vcf
 echo *****done*****
 
 echo *****VariantFiltration $1******
-java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar \
+java -Xmx8g -jar $TOOLS/gatk/GenomeAnalysisTK.jar VariantFiltration \
 -R $REFS/rCRS-MT.fa \
--T VariantFiltration \
 --variant $TMPDIR/$1.tcga.snps.vcf \
--o $TMPDIR/$1.snps.recalibrated.filtered.vcf \
---filterExpression "QD < 2.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
---filterName "my_snp_filter" \
+-O $TMPDIR/$1.snps.recalibrated.filtered.vcf \
+--filter-expression "QD < 2.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0" \
+--filter-name "my_snp_filter" \
 
 mv $TMPDIR/$1.snps.recalibrated.filtered.vcf $3/$1_gatk.vcf
 echo *****done $1*****

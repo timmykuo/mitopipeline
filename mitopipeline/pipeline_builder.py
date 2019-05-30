@@ -57,8 +57,6 @@ class PipelineBuilder():
                 if 'splitgap' not in steps:
                     if step == 'removenumts':
                         job_name = 'remove_numts_no_split_gap.sh'
-                    if step == 'gatk':
-                        job_name = 'gatk_nosplitgap.sh'
                 pipeline.write(self.get_template(slurm, prev_step, job_name, step))
                 if "gatk" in step or step not in self.softwares:
                     prev_step = step

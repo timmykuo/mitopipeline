@@ -20,10 +20,7 @@ echo .
 echo .
 echo .
 echo ----bam2fastq
-java -jar $5/tools/SamToFastq.jar \
-I=$START/$1$filetype.bam \
-FASTQ=$OUT/$1_bam2fastq.fastq \
-SECOND_END_FASTQ=$OUT/$1_bam2fastq_2.fastq
+bedtools bamtofastq -i $START/$1$filetype.bam -fq $OUT/$1_bam2fastq.fastq -fq2 $OUT/$1_bam2fastq_2.fastq
 
 echo ****BAM2FASTQ DONE.
 echo .

@@ -20,7 +20,7 @@ def is_valid_directories(directory, tools, refs, steps, softwares):
 def check_file_format(directory):
     for f in os.listdir(directory):
         #ignore hidden files
-        if not f.startswith('.') and not correct_format(f):
+        if not f.startswith('.') and not correct_format(f) and "bai" not in f:
             raise ValueError(
                 "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
 
@@ -29,7 +29,7 @@ def check_tools_exist(tools_dir, steps, dependencies):
     for step in steps:
         for dep in dependencies[step]:
             if not found_loc(dep, tools_dir):
-                raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + step)
+                raise ValueError('Can\'t find ' + dep + ' in ' + tools_dir + ". Please download using -d option or make sure your tools directory has a folder called " + dep)
 
 #function to check annovar dependencies, can't make it general since the files are specific
 def is_annovar_downloaded(software, tools_dir):

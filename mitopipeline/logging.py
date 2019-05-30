@@ -4,12 +4,7 @@ class Download_Logger():
 
     def __init__(self, name):
         self.logger = logging.getLogger(name)
-        logging.basicConfig(level=logging.INFO)
-        stream_handler = logging.StreamHandler()
-        stream_format = logging.Formatter('%(asctime)s - %(levelname)s:  %(message)s')
-        stream_handler.setFormatter(stream_format)
-        self.logger.addHandler(stream_handler)
-
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s:  %(message)s')
 
     def warning(self, msg):
         self.logger.warning(msg)
