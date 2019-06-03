@@ -15,7 +15,6 @@ START=$2
 TOOLS=$4
 filename=$1
 currdir=`pwd`
-
 #last string following / delimeter will be name of the previous job
 #only set filetype if the value was a step in the pipeline
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
@@ -23,7 +22,7 @@ if [ "$filetype" != "_extractmito" ] && [ "$filetype" != "_clipping" ] && [ "$fi
 then
 filetype=""
 fi
-
+LENGTH=`python $5/read_depths.py $START/$1_1$filetype.fastq`
 function CountReads {
 samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 }
@@ -32,11 +31,28 @@ samtools view -c -F 4 $STOR/$2$1.sorted.bam > $COUNTS/$2$1.count
 function Align {
 if [ -e "$START/$1_1$filetype.fastq" ]
 then
-echo PAIRED_END 
-bwa mem -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	echo PAIRED_END 
+	if (( $LENGTH > 70 ))
+	then
+	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
+	bwa mem -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	else
+	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
+	bwa aln $3 $START/$1_1$filetype.fastq > $STOR/$1$2_1.sai
+	bwa aln $3 $START/$1_2$filetype.fastq > $STOR/$1$2_2.sai
+	bwa sampe $3 $STOR/$1$2_1.sai $STOR/$1$2_2.sai $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	fi
 else
-echo SINGLE_END
-bwa mem -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
+	echo SINGLE_END
+	if (( $LENGTH > 70 ))
+	then
+	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
+	bwa mem -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
+	else
+	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
+	bwa aln $3 $START/$1$filetype.fastq > $STOR/$1$2.sai
+	bwa samse $3 $STOR/$1$2.sai $START/$1$filetype.fastq > $STOR/$1$2.sam
+	fi
 fi
 }
 
@@ -93,9 +109,28 @@ echo .
 echo ----bwa alignment to hg38-norCRS --NUMTs: going to make $1_cl--nuclear.sam
 if [ -e "$START/$1_1$filetype.fastq" ]
 then
-bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	echo PAIRED-END
+	if (( $LENGTH > 70 ))
+	then
+	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
+	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	else
+	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
+	bwa aln $REF/hg38-nochr.fa $START/$1_1$filetype.fastq > $STOR/$1_1_hg38-nochr.sai
+	bwa aln $REF/hg38-nochr.fa $START/$1_2$filetype.fastq > $STOR/$1_2_hg38-nochr.sai
+	bwa sampe $REF/hg38-nochr.fa $STOR/$1_1_hg38-nochr.sai $STOR/$1_2_hg38-nochr.sai $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	fi 
 else
-bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	echo SINGLE-END
+	if (( $LENGTH > 70 ))
+	then
+	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
+	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	else
+	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
+	bwa aln $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_hg38-nochr.sai
+	bwa samse $REF/hg38-nochr.fa $STOR/$1_hg38-nochr.sai $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	fi
 fi
 echo ****bwa alignment to hg38-norCRS DONE.
 echo .
