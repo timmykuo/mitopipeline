@@ -1,8 +1,8 @@
-import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile, requests, io
+import os, platform, urllib.request, pkg_resources, subprocess, tarfile, zipfile, requests, io, sys
 from mitopipeline.util import is_downloaded, is_exe, cd, which, execute, query_yes_no, get_dir_name
 from mitopipeline.logging import Download_Logger
 logger = Download_Logger(__name__)
-
+NUM_BARS = 50
 class Downloader():
 
     cache = []
@@ -16,7 +16,7 @@ class Downloader():
             self.TOOLS = pkg_resources.resource_filename('mitopipeline', "/") + "/tools"
         if not os.path.isdir(self.TOOLS):
             os.makedirs(self.TOOLS)
-        
+
         self.dependencies = {'snpeff': ['snpEff'],
                                 'annovar': ['annovar'],
                                 'gatk': ['GenomeAnalysisTK'],
@@ -27,13 +27,10 @@ class Downloader():
         self.downloads = {'snpEff': 'http://sourceforge.net/projects/snpeff/files/snpEff_latest_core.zip/download',
                           'annovar': 'http://annovar.openbioinformatics.org/en/latest/user-guide/download/',
                           'GenomeAnalysisTK': 'https://github.com/broadinstitute/gatk/releases/download/4.1.2.0/gatk-4.1.2.0.zip',
-                        'samtools': 'https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2',
+                          'samtools': 'https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2',
                           'bedtools2': 'https://github.com/arq5x/bedtools2/releases/download/v2.28.0/bedtools-2.28.0.tar.gz',
-                        #'samtools': 'git clone https://github.com/samtools/samtools.git',
-                        'bwa': 'git clone https://github.com/lh3/bwa.git',
-                        'seqtk': 'git clone https://github.com/lh3/seqtk.git'}
-    
-    #def refs(self, steps):
+                          'bwa': 'git clone https://github.com/lh3/bwa.git',
+                          'seqtk': 'git clone https://github.com/lh3/seqtk.git'}
 
     def download_dependencies(self, steps):
         logger.info('Tools directory is ' + self.TOOLS)
@@ -77,7 +74,7 @@ class Downloader():
             elif 'tar.bz2' in url or 'tar.gz' in url:
                 self.download_tar(url)
             elif 'zip' in url:
-                self.download_zip(url)
+                self.download_zip(url, software)
             else:
                 raise ValueError(software + ' url not found')
                 
@@ -122,20 +119,37 @@ class Downloader():
             else:
                 logger.warning("When trying to add to the command line, this is an unknown operating system. Please download manually.")
 
-    def download_zip(self, url):
-        r = requests.get(url)
-        z = zipfile.ZipFile(io.BytesIO(r.content))
+    def download_zip(self, url, software):
+        file_name = software + ".data"
+        with open(file_name, "wb") as f:
+                response = requests.get(url, stream=True)
+                total_length = response.headers.get('content-length')
+
+                if total_length is None:  # no content length header
+                    f.write(response.content)
+                else:
+                    dl = 0
+                    total_length = int(total_length)
+                    for data in response.iter_content(chunk_size=4096):
+                        dl += len(data)
+                        f.write(data)
+                        done = int(NUM_BARS * dl / total_length)
+                        sys.stdout.write("\r|%s%s| %s " % ('|' * done, ' ' * (NUM_BARS-done), "{0:.0f}%".format(done / NUM_BARS * 100)))
+                        sys.stdout.flush()
+                    sys.stdout.write("\n")
+                    sys.stdout.flush()
+        logger.info("Extracting zipfile contents for " + software)
+        z = zipfile.ZipFile(file_name, mode='r')
         z.extractall()
+        os.remove(file_name)
 
     def download_tar(self, url):
         ftpstream = urllib.request.urlopen(url)
-
         tmpfile = io.BytesIO()
         while True:
             s = ftpstream.read(16384)
             if not s:
                 break
-
             tmpfile.write(s)
         ftpstream.close()
 
