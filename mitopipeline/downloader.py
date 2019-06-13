@@ -32,6 +32,7 @@ class Downloader():
                           'bwa': 'git clone https://github.com/lh3/bwa.git',
                           'seqtk': 'git clone https://github.com/lh3/seqtk.git'}
 
+    #Downloads all dependent softwares of a step if not yet downloaded in the cached tools directory or not available on the command line if necessary
     def download_dependencies(self, steps):
         logger.info('Tools directory is ' + self.TOOLS)
         for step in steps:

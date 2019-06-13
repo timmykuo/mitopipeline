@@ -13,8 +13,10 @@ class CommandLineParser():
 
     def build_and_run(self, steps):
         pipeline_builder = PipelineBuilder()
-        pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes)
-        PipelineRunner.run(self.__opts)
+        if pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes):
+            PipelineRunner.run(self.__opts)
+        else:
+            raise RuntimeError("There was an error in building the pipeline. Please double check your command lien arguments")
         
     def _build_parser(self):
         parser = argparse.ArgumentParser()
