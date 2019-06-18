@@ -15,6 +15,38 @@ Required Arguments
 | **Reference Genomes:**
 | With steps such as GATK and RemoveNuMTs, it's necessary to have human reference genomes to align to. The required genomes for this pipeline are `hg38-nochr.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version human genome without the mitochondrial genome), `hg38.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version of the human mitochondrial genome), and `rCRS-MT.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/chromosomes/chrM.fa.gz>`_ (the GRCh38/hg38 version of the human mitochondrial genome). The file names must be changed to match the ones listed here so that the steps are able to find the files. You can read more about the human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_. Since the files are too large to be downloaded along with the mitopipeline package, the user must specify the path to the reference genomes after downloading.
 
+Python Modules on a server
+--------------------------
+
+On an online server, users typically do not have permission to download softwares and modules directly due to lack of administrative privileges. In this case, users will need to set up python modules that contains the location of mitopipeline (custom to their server). Here's an example of how to do this on Case Western's HPC server that uses the slurm workload mananger and environmental module loading:
+
+.. code:: bash
+
+    PYTHONMODULES=$HOME/.usr/local/share/modulefiles/python-modules
+    mkdir -p $PYTHONMODULES
+    cd $PYTHONMODULES
+    module load python-modules/3.5.1-gcc
+
+where the python-modules/3.5.1-gcc file contains:
+
+.. code:: bash
+
+    -- This is Lua module file for our local Python
+    -- modules.
+    -- To use it just run
+    --    module load python-modules/3.5.1-gcc
+    --
+    --
+
+    load("intel/17","python/3.5.1")
+
+    pushenv("PYTHONUSERBASE",pathJoin(os.getenv("HOME"),".local"))
+    prepend_path("PATH",pathJoin(os.getenv("HOME"),".local/bin"))
+
+From here, if you used mitopipeline's "-d" command line option to download tools for you, the tools directory can now be referennced through: " ~/.local/lib/python3.5/site-packages/mitopipeline/tools/".
+
+Note: If you are using ANNOVAR, you must move the entire folder over to "~/.local/lib/python3.5/site-packages/mitopipeline" after downloading yourself, because ANNOVAR requires user registration before downloading (so it's unavailable through "-d").
+
 Luigi
 -----
 
