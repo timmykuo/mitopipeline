@@ -15,19 +15,27 @@ Required Arguments
 | **Reference Genomes:**
 | With steps such as GATK and RemoveNuMTs, it's necessary to have human reference genomes to align to. The required genomes for this pipeline are `hg38-nochr.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version human genome without the mitochondrial genome), `hg38.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/>`_ (the GRCh38/hg38 version of the human mitochondrial genome), and `rCRS-MT.fa <http://hgdownload.cse.ucsc.edu/goldenPath/hg38/chromosomes/chrM.fa.gz>`_ (the GRCh38/hg38 version of the human mitochondrial genome). The file names must be changed to match the ones listed here so that the steps are able to find the files. You can read more about the human references genomes from the `UCSC genome browser <http://hgdownload.cse.ucsc.edu/downloads.html#human>`_. Since the files are too large to be downloaded along with the mitopipeline package, the user must specify the path to the reference genomes after downloading.
 
-Python Modules on a server
+Python Modules on HPC
 --------------------------
 
-On an online server, users typically do not have permission to download softwares and modules directly due to lack of administrative privileges. In this case, users will need to set up python modules that contains the location of mitopipeline (custom to their server). Here's an example of how to do this on Case Western's HPC server that uses the slurm workload mananger and environmental module loading:
+On an online server, users typically do not have permission to download softwares and modules directly due to lack of administrative privileges. In this case, users will need to set up python modules that contains the location of mitopipeline (custom to their server). Here's an example of how to do this on Case Western's HPC server that uses the slurm workload mananger and environmental module loading. For more details, you can refer to the Case Western HPC website for more detailed `instructions https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules`_ on how to use pip to install and use python modules:
+
+First, to install the module, we need to first set up the enviromental module $PYTHONUSERBASE.
+
+.. code:: bash
+    
+    export PYTHONUSERBASE=$HOME/.usr/local/python/3.5.1
+    pip install --user mitopipeline
+
+This will install mitopipline into the $PYTHONUSERBASE directory. To use the installed module (since this tool contains binaries), we need to include it in the path. For our local directory of packages, we will create a module file that will set those variables for us. We will call the module "python-modules" and we will set the version of the module to the version of Python we are using. First, we will create the directory (just once).
 
 .. code:: bash
 
     PYTHONMODULES=$HOME/.usr/local/share/modulefiles/python-modules
     mkdir -p $PYTHONMODULES
     cd $PYTHONMODULES
-    module load python-modules/3.5.1-gcc
 
-where the python-modules/3.5.1-gcc file contains:
+Then, we will create a file called 3.5.1-gcc.lua in this directory that contains the following contet:
 
 .. code:: bash
 
@@ -38,12 +46,17 @@ where the python-modules/3.5.1-gcc file contains:
     --
     --
 
-    load("intel/17","python/3.5.1")
+    load("intel/17", "openmpi/2.0.1","python/3.5.1")
 
-    pushenv("PYTHONUSERBASE",pathJoin(os.getenv("HOME"),".local"))
-    prepend_path("PATH",pathJoin(os.getenv("HOME"),".local/bin"))
+    pushenv("PYTHONUSERBASE",pathJoin(os.getenv("HOME"),".usr/local/python/3.5.1"))
+    prepend_path("PATH",pathJoin(os.getenv("HOME"),".usr/local/python/3.5.1/bin))
 
-From here, if you used mitopipeline's "-d" command line option to download tools for you, the tools directory can now be referennced through: " ~/.local/lib/python3.5/site-packages/mitopipeline/tools/".
+To use this module, just run
+
+..code:: bash
+    module load python-modules/3.5.1-gcc
+
+From here, if you used mitopipeline's "-d" command line option to download tools for you, the tools directory can now be referenced through: " /home/<case_ID>/.usr/local/python/3.5.1/lib/python3.5/site-packages/mitopipeline/tools/".
 
 Note: If you are using ANNOVAR, you must move the entire folder over to "~/.local/lib/python3.5/site-packages/mitopipeline" after downloading yourself, because ANNOVAR requires user registration before downloading (so it's unavailable through "-d").
 

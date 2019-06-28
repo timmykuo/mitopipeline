@@ -10,7 +10,10 @@ def get_read_depths(fastq_file):
                 depth += len(line)
                 num_lines += 1
             line_num += 1
-        avg_depth = depth / num_lines
+        if num_lines == 0:
+            avg_depth = 0
+        else:
+            avg_depth = int(round(depth / num_lines))
 
     print(avg_depth)
 

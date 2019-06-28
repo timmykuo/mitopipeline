@@ -1,4 +1,4 @@
-import argparse, sys, os
+import argparse, sys, os, time
 from mitopipeline.pipeline_builder import PipelineBuilder
 from mitopipeline.pipeline_runner import PipelineRunner
 class CommandLineParser():
@@ -12,9 +12,11 @@ class CommandLineParser():
         return opts
 
     def build_and_run(self, steps):
+        start_time = time.time()
         pipeline_builder = PipelineBuilder()
         if pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes):
             PipelineRunner.run(self.__opts)
+            print("--- %s seconds ---" % (time.time() - start_time))
         else:
             raise RuntimeError("There was an error in building the pipeline. Please double check your command lien arguments")
         

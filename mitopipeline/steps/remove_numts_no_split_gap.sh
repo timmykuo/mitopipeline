@@ -35,7 +35,7 @@ then
 	if (( $LENGTH > 70 ))
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
-	bwa mem -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	bwa mem -M -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $3 $START/$1_1$filetype.fastq > $STOR/$1$2_1.sai
@@ -47,7 +47,7 @@ else
 	if (( $LENGTH > 70 ))
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
-	bwa mem -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
+	bwa mem -M -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $3 $START/$1$filetype.fastq > $STOR/$1$2.sai
@@ -183,7 +183,7 @@ then
 		bwa sampe $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_1.sai $STOR/$1_cl--rCRS-lowNUMTs_2.sai $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
 	else
 		echo "average read_depth is $LENGTH. Using bwa-mem algorithm"
-		bwa mem -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
+		bwa mem -M -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
 	fi
 else
 	echo "SINGLE-END"
@@ -194,7 +194,7 @@ else
 		bwa samse $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.sai $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1.mito_hg38.sam
 	else
 		echo "average read_depth is $LENGTH. Using bwa-mem algorithm"
-		bwa mem -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1.mito_hg38.sam
+		bwa mem -M -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1.mito_hg38.sam
 	fi
 fi
 echo ****bwa DONE.
