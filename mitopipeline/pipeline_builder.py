@@ -35,18 +35,18 @@ class PipelineBuilder():
                              'extractmito': ['samtools'],
                              'splitgap': ['samtools']}
 
-    def build_pipeline(self, tools=None, slurm=False, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None):
+    def build_pipeline(self, tools=None, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None, email=None):
         tools = tools if tools else self.TOOLS
         if is_valid_directories(directory, refs, steps) and tools_exist(tools, steps, self.dependencies):
-            return self.build_from_template(directory, steps, slurm, output, tools, refs)
+            return self.build_from_template(directory, steps, output, tools, refs, email)
         else:
             raise ValueError("Errors in directories and/or software requirements.")
 
-    def build_from_template(self, directory, steps, slurm, output, tools, refs):
+    def build_from_template(self, directory, steps, output, tools, refs, email):
         #user specified output or stored within mitopipeline directory
         output = output if output else "./pipeline_output"
         if files_correct_format(directory):
-            make_subdirectories(output, self.task_template_info, steps, slurm)
+            make_subdirectories(output, self.task_template_info, steps, email)
             with open(output + '/pipeline.py', 'w') as pipeline:
                 pipeline.write(import_template.render(imports=['mitopipeline.util', 'luigi', 'subprocess', 'os', 'shutil', 'pkg_resources']))
                 pipeline.write(paths_template.render(directory=directory, output=output, tools=tools, refs=refs) + "\n\n")
@@ -60,27 +60,27 @@ class PipelineBuilder():
                     if 'splitgap' not in steps:
                         if step == 'removenumts':
                             job_name = 'remove_numts_no_split_gap.sh'
-                    pipeline.write(self.get_template(slurm, prev_step, job_name, step))
+                    pipeline.write(self.get_template(prev_step, job_name, step, email))
                     if "gatk" in step or step not in self.softwares:
                         prev_step = step
         return os.path.isfile(output + "/pipeline.py")
              
-    def get_template(self, slurm, prev_step, job_name, step):
+    def get_template(self, prev_step, job_name, step, email):
         task_name = self.task_template_info[step][self.FOLDER_NAME]
         file_name = self.task_template_info[step][self.EXTENSION]
         prev_task_name = self.task_template_info[prev_step][self.FOLDER_NAME]
         #if slurm job requested
-        if slurm:
+        if email:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
                 return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name) + "\n"
+                return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name, email=email) + "\n"
         else:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
                 return task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name) + "\n"
+                return task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name, email=email) + "\n"

@@ -14,7 +14,7 @@ class CommandLineParser():
     def build_and_run(self, steps):
         start_time = time.time()
         pipeline_builder = PipelineBuilder()
-        if pipeline_builder.build_pipeline(slurm=self.__opts.slurm, tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes):
+        if pipeline_builder.build_pipeline(tools=self.__opts.tools, directory=self.__opts.directory, steps=steps, output=self.__opts.output, refs=self.__opts.genomes, email=self.__opts.slurm):
             PipelineRunner.run(self.__opts)
             print("--- %s seconds ---" % (time.time() - start_time))
         else:
@@ -29,7 +29,7 @@ class CommandLineParser():
         required_args.add_argument('-t', '--tools', help="Path to the directory that contains all of the 3rd party packages", default=None)
         #optional arguments
         parser.add_argument('-o', '--output', help="Path to where you want the output to be stored", default=None)
-        parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step", default=False, action='store_true')
+        parser.add_argument('-l', '--slurm', help="Use slurm jobs to run each step, include an email address for status", type=str, default=None)
         parser.add_argument('-d', '--download', help="Specify softwares you want to download", default=False, action='store_true')
         parser.add_argument('-r', '--remove', nargs='+', help="Steps to not run in this pipeline", default=None)
         #parser.add_argument('-c', '--config', help="Use the config file to specify software options", default=None)

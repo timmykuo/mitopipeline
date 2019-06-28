@@ -77,7 +77,7 @@ def is_downloaded(software, dir):
     return is_exe(dir + "/" + software)
 
 #creates subdirectories for all the requested steps within the specified output directory
-def make_subdirectories(output, task_names, steps, slurm):
+def make_subdirectories(output, task_names, steps, email):
     #create output folder that holds the mitopipeline output in the tool's directory
     if not os.path.isdir(output):
         os.makedirs(output)
@@ -93,7 +93,7 @@ def make_subdirectories(output, task_names, steps, slurm):
                 task_subfolder = task_folder + "/" + sub
                 if not os.path.isdir(task_subfolder):
                     os.makedirs(task_subfolder)
-    if slurm and not os.path.isdir(output + "/slurm"):
+    if email and not os.path.isdir(output + "/slurm"):
         os.makedirs(output + "/slurm")
 
 #returns either all of the softwares after gatk or the latest step before or
