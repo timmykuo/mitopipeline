@@ -15,6 +15,7 @@ Mitopipeline Documentation
    pipeline_builder.rst
    running_the_pipeline.rst
    configuration.rst
+   troubleshooting.rst
 
 
 Indices and tables
