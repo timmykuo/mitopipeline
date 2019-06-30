@@ -95,6 +95,7 @@ def make_subdirectories(output, task_names, steps, email):
                     os.makedirs(task_subfolder)
     if email and not os.path.isdir(output + "/slurm"):
         os.makedirs(output + "/slurm")
+        os.makedirs(output + "/slurm/STDOUT")
 
 #returns either all of the softwares after gatk or the latest step before or
 def get_wrapper_tasks(task_names, steps, softwares):

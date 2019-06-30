@@ -73,7 +73,7 @@ class PipelineBuilder():
         if email:
             #first step in the pipeline has no 'require' function
             if prev_step == "":
-                return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
+                return slurm_task_template.render(task_name=task_name, job_name=job_name, file_name=file_name, email=email) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
                 return slurm_task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name, email=email) + "\n"
@@ -83,4 +83,4 @@ class PipelineBuilder():
                 return task_template.render(task_name=task_name, job_name=job_name, file_name=file_name) + "\n\n"
             #if not the first step in the pipeline, require the previous step
             else:
-                return task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name, email=email) + "\n"
+                return task_with_req_template.render(task_name=task_name, req_name=prev_task_name, job_name=job_name, file_name=file_name) + "\n"

@@ -7,27 +7,22 @@
 #$6 is the tools directory 
 # $7 is steps directory
 # $8 is the refs directory 
+# $9 is email address
 if [ ! -f $3/$2_$1.slurm ];
 then
 FILE="$3/$2_$1.slurm"
 touch $3/$2_$1.slurm
 echo '#!/bin/bash' >> $FILE
-#echo '#SBATCH --mail-user=tyk3@case.edu' >> $FILE
-#echo '#SBATCH --mail-type=ALL' >> $FILE
 echo '#SBATCH -n 1' >> $FILE
 echo '#SBATCH -N 1' >> $FILE
 echo '#SBATCH --time=12:00:00' >> $FILE
-echo '#SBATCH --mem=20GB' >> $FILE
 echo '#SBATCH -J '"$2_$1" >> $FILE
 echo '#SBATCH --mail-user='"$9" >> $FILE
 echo '#SBATCH --mail-type=ALL' >> $FILE
-echo '#SBATCH --mem='"5"'GB' >> $FILE
-#echo '#SBATCH -A txl80' >> $FILE
-echo 'bash '"$7"'/steps/'"$2"'.sh '"$1 $4 $5 $6 $7 $8"' >> '"$3"'/STDOUT/'"$2"'_'"$1"'.out 2>&1' >> $FILE
+echo '#SBATCH --mem='"50"'GB' >> $FILE
+echo 'bash '"$7"'/'"$2" "$1 $4 $5 $6 $7 $8"' >> '"$3"'/STDOUT'"$2"'_'"$1"'.out 2>&1' >> $FILE
 sleep 1
 fi
-
-cd $3
 
 sleep 1
 #run slurm job
@@ -44,5 +39,4 @@ queue=$(squeue -u tyk3)
 inQueue=$(echo "$queue" | grep $batchId)
 done
 
-rm $2_$1.slurm
-rm slurm-$batchId.out
+rm slurm-$batchId

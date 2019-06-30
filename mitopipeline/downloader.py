@@ -42,7 +42,8 @@ class Downloader():
                     if get_dir_name(software, self.TOOLS) or get_dir_name(step, self.TOOLS):
                         logger.info(software + " is already downloaded in " + self.TOOLS + ". Skipping download.")
                     elif (software == 'samtools' or software == 'bwa' or software == 'bedtools2'):
-                        if not which(software):
+                        #hack for bedtools2 because it's referencned as just bedtools on the command line, not bedtools2
+                        if not which(software) or (software =='bedtools2' and not which('bedtools')):
                             logger.info(software + ' is not available on the command line. Starting download...')
                             self.download(software, self.TOOLS)
                             dir_name = get_dir_name(software, self.TOOLS)

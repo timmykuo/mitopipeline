@@ -41,8 +41,9 @@ Running Pipeline
     "``-o`` or ``--output``", "| Specifies where to store the output of the pipeline results. Will create folders for each step within the output directory.
     | **Input**: <path/to/output/directory>
     | **Default**: current directory"
-    "``-l`` or ``--slurm``", "| Use the slurm workload manager to submit batch jobs for each step of the pipeline
-    | **Default**: False"
+    "``-l`` or ``--slurm``", "| Use the slurm workload manager to submit batch jobs for each step of the pipeline. Status of jobs will be emailed to address, use "None" if no email is to be sent.
+    | **Input**: email address, i.e. tyk3@case.edu
+    | **Default**: None"
     "``-w`` or ``--workers``", "| Specifies the number of workers to use when running the pipeline.
     | **Input**: integer
     | **Default**: 1"

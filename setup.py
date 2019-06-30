@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setup(
     name="mitopipeline",
-    version="1.0.post2",
+    version="1.1post1",
     packages=['mitopipeline'],
     package_dir={'mitopipeline': 'mitopipeline'},
     py_modules=['mitopipeline'],

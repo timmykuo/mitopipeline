@@ -1,6 +1,11 @@
 Troubleshooting
 ***************
 
+Outdated Modules on Case Western's HPC
+--------------------------------------
+
+As mentioned in the Running The Pipeline section, using mitopipeline on a separate server without admin privileges may require you to update various python modules on your own local ennvironment. For Case Western's HPC server, the details can be found `here https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules`_. In particular, python-dateutil will most likely need to be updated and installing mitopipeline itself will require you to use this method.
+
 Reference Genomes
 -----------------
 
@@ -10,14 +15,12 @@ In addition, you must index the reference genomes through samtools/bwa. For each
 
 <REF_name>.fa, <REF_name>.fa.amb, <REF_name>.fa.ann, <REF_name>.fa.bwt, <REF_name>.fa.fai, <REF_name>.fa.pac, <REF_name>.fa.sa, <REF_name>.dict
 
-Lastly, the mitochondrial genome MUST be named "MT" (and not chrM, chrM_rCRS, M) in all of the reference genomes. This is because in hg38, the mito genome is named MT, and in order to match the reference contig, they use the string of the name.
+Lastly, the mitochondrial genome MUST be named "MT" (not chrM, chrM_rCRS, M) in all of the reference genomes. This is because in hg38, the mito genome is named MT, and matching to the reference contig is done through the literal string of the name.
 
 SnpEff
 ------
 
-SnpEff requires its own database and reference genome in order to be run. Thus, if it's your first time running the pipeline and you have multiple workers, it may be necessary to run 1 file first. Since SnpEff will be downloading its database the first time it runs, having multiple workers overlapping and trying to download 
-
-
+SnpEff requires its own database and reference genome in order to be run. Thus, if it's your first time running the pipeline and you have multiple workers, it may be necessary to run 1 file first. Since SnpEff will be downloading its database the first time it runs, having multiple workers overlapping and trying to download the same database can cause some issues within the pipeline.
 
 ANNOVAR
 -------
