@@ -4,7 +4,7 @@ Troubleshooting
 Outdated Modules on Case Western's HPC
 --------------------------------------
 
-As mentioned in the Running The Pipeline section, using mitopipeline on a separate server without admin privileges may require you to update various python modules on your own local ennvironment. For Case Western's HPC server, the details can be found `here https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules`_. In particular, python-dateutil will most likely need to be updated and installing mitopipeline itself will require you to use this method.
+As mentioned in the Running The Pipeline section, using mitopipeline on a separate server without admin privileges may require you to update various python modules on your own local ennvironment. For Case Western's HPC server, the details can be found `here <https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules>`_. In particular, python-dateutil will most likely need to be updated and installing mitopipeline itself will require you to use this method.
 
 Reference Genomes
 -----------------
@@ -25,4 +25,4 @@ SnpEff requires its own database and reference genome in order to be run. Thus, 
 ANNOVAR
 -------
 
-Similar to SnpEff, ANNOVAR also requires its individual database and files in order to run. After registering and downloading, it's necessary to run table_anovar.pl before runnig mitopipeline. In particular, the `quick start http://annovar.openbioinformatics.org/en/latest/user-guide/startup/`_ page for ANNOVAR explains in detail how to do this. Note: the scripts in mitopipeline uses hg38, NOT hg19 as suggested on the website. Other than that, you can run each command as listed there.
+Similar to SnpEff, ANNOVAR also requires its individual database and files in order to run. After registering and downloading, it's necessary to run table_anovar.pl before runnig mitopipeline. In particular, the `quick start <http://annovar.openbioinformatics.org/en/latest/user-guide/startup/>`_ page for ANNOVAR explains in detail how to do this. Note: the scripts in mitopipeline uses hg38, NOT hg19 as suggested on the website. Other than that, you can run each command as listed there.

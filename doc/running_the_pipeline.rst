@@ -18,7 +18,7 @@ Required Arguments
 Python Modules on Case's HPC
 -----------------------------
 
-On an online server, users typically do not have permission to download softwares and modules directly due to lack of administrative privileges. In this case, users will need to set up python modules that contains the location of mitopipeline. Here's an example of how to do this on Case Western's HPC server that uses the slurm workload mananger and lmod. For more details, you can refer to the Case Western HPC website for more detailed `instructions https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules`_ on how to use pip to install and use python modules:
+On an online server, users typically do not have permission to download softwares and modules directly due to lack of administrative privileges. In this case, users will need to set up python modules that contains the location of mitopipeline. Here's an example of how to do this on Case Western's HPC server that uses the slurm workload mananger and lmod. For more details, you can refer to the Case Western HPC website for more detailed `instructions <https://sites.google.com/a/case.edu/hpcc/hpc-tutorials/installing-local-python-modules>`_ on how to use pip to install and use python modules:
 
 First, to install the module, we need to first set up the enviromental module $PYTHONUSERBASE.
 
