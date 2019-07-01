@@ -53,7 +53,7 @@ Then, we will create a file called 3.5.1-gcc.lua in this directory that contains
 
 To use this module, just run
 
-..code:: bash
+.. code:: bash
     module load python-modules/3.5.1-gcc
 
 From here, if you used mitopipeline's "-d" command line option to download tools for you, the tools directory can now be referenced through: " /home/<case_ID>/.usr/local/python/3.5.1/lib/python3.5/site-packages/mitopipeline/tools/". Note: If you are using ANNOVAR, you must move the entire folder over to "~/.local/lib/python3.5/site-packages/mitopipeline" after downloading yourself, because ANNOVAR requires user registration before downloading (so it's unavailable through "-d"). Of course, you can also specify your own tools directory.

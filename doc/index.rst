@@ -12,7 +12,7 @@ Mitopipeline Documentation
    :maxdepth: 2
 
    example_one_genome.rst
-   pipeline_builder.rst
+   pipeline_steps.rst
    running_the_pipeline.rst
    configuration.rst
    troubleshooting.rst

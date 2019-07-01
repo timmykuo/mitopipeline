@@ -2,6 +2,7 @@ import os, shutil, pkg_resources, subprocess, sys
 
 #f is a file with an extension of .bam or .bai
 def parse_fid(f):
+    #remove extension
     parsed = str(f).split(".")
     fid = ""
     #ignore the extension
@@ -11,11 +12,29 @@ def parse_fid(f):
     #remove the last period
     if fid != "":
         fid = fid[:-1]
-    return fid
 
-#ensure that all files in starting directory is either a bam or bai file
-def correct_format(f):
-    return f.endswith(("bam", "bai"))
+    if f.endswith(("bam", "bai", "vcf")):
+        return fid
+    elif f.endswith("fastq"):
+        if fid.endswith(("_1", "_2")):
+            fid = fid[:-2]
+        return fid
+    else:
+        raise ValueError("Parsing file must end with bam, bai, vcf, or fastq")
+
+#ensure that all files in starting directory are same types of files
+def correct_format(f, f_end):
+    return f.endswith(f_end)
+
+def get_f_end(f):
+    if f.endswith("bam"):
+        return "bam"
+    elif f.endswith("bai"):
+        return "bai"
+    elif f.endswith("fastq"):
+        return "fastq"
+    else:
+        return ValueError('Files must be either bam or fastq files')
 
 #checks that directory exists and mito directory contains the "steps" folder
 def is_valid_directories(directory, refs, steps):
@@ -26,14 +45,30 @@ def is_valid_directories(directory, refs, steps):
     else:
         return True
     
+def correct_start_files(step, directory):
+    if (step == "extractmito" or step == "clipping" or step == "splitgap" or step == "gatk") and not all_same_end(directory, ("bam", "bai")):
+        raise ValueError("First step in your pipeline is " + step + ". All files in your start directory must end with bam/bai")
+    elif (step == "removenumts") and not all_same_end(directory, ("fastq")):
+        raise ValueError("First step in your pipeline is " + step + ". All files in your start directory must end with fastq")
+    elif (step == "snpeff" or step == "annovar") and not all_same_end(directory, ("vcf")):
+        raise ValueError("First step in your pipeline is " + step + ". All files in your start directory must end with vcf")
+    return True
+
+def all_same_end(directory, ends):
+    for f in os.listdir(directory):
+        if not f.endswith(ends):
+            return False
+    return True
+
 #checks that the file format follows our naming convenction
 def files_correct_format(directory):
     for f in os.listdir(directory):
-        #ignore hidden files
-        if not f.startswith('.') and not correct_format(f):
+        f_end = get_f_end(f)
+        if not f.startswith('.') and not correct_format(f, f_end):
             raise ValueError(
-                "All files saved in user-specified directory must follow the format 'FILENAME.bam' with NO periods allowed in FILENAME")
+                "All files saved in user-specified directory must follow the same format of 'FILENAME.bam' or 'FILENAME_1.fastq/FILENAME_2.fastq/FILENAME.fastq' (depending on if it's paired end).")
     return True
+
 #check that all tools required in steps are in the tools directory
 def tools_exist(tools_dir, steps, dependencies):
     for step in steps:

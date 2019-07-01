@@ -1,5 +1,5 @@
 import os, sys, pkg_resources
-from mitopipeline.util import tools_exist, files_correct_format, make_subdirectories, is_valid_directories, get_wrapper_tasks
+from mitopipeline.util import tools_exist, files_correct_format, make_subdirectories, is_valid_directories, get_wrapper_tasks, correct_start_files, all_same_end
 from mitopipeline.templates import task_template, task_with_req_template, import_template, paths_template, wrapper_task_template, slurm_task_template, slurm_task_with_req_template
 
 class PipelineBuilder():
@@ -35,9 +35,9 @@ class PipelineBuilder():
                              'extractmito': ['samtools'],
                              'splitgap': ['samtools']}
 
-    def build_pipeline(self, tools=None, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'downsample', 'gatk', 'snpeff', 'annovar', 'haplogrep'], output=None, refs=None, email=None):
+    def build_pipeline(self, tools=None, directory=None, steps=['extractmito', 'splitgap', 'clipping', 'remove_numts', 'gatk', 'snpeff', 'annovar'], output=None, refs=None, email=None):
         tools = tools if tools else self.TOOLS
-        if is_valid_directories(directory, refs, steps) and tools_exist(tools, steps, self.dependencies):
+        if is_valid_directories(directory, refs, steps) and tools_exist(tools, steps, self.dependencies) and correct_start_files(steps[0], directory):
             return self.build_from_template(directory, steps, output, tools, refs, email)
         else:
             raise ValueError("Errors in directories and/or software requirements.")

@@ -14,7 +14,7 @@ Pipeline
 --------
 .. figure:: https://raw.githubusercontent.com/timmykuo/mitopipeline/master/doc/pipeline.png
 
-The steps shown in this figure are described further in the Pipeline Steps page. Each step can be omitted if it's unncessary for your pipeline and can also be replaced with your own scripts.
+The steps shown in this figure are described further in the Pipeline Steps page. Each step can be omitted if it's unncessary for your pipeline.
 
 Credits
 ----------------

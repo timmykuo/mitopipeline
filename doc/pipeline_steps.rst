@@ -9,8 +9,9 @@ Extract Mito
 ------------
 
 | **REQUIRED** 
-| **Input:** bam file
 | **Tools from command line:** samtools
+| **Input:** bam file
+| **Output:** bam file
 
 .. code:: bash
 
@@ -27,8 +28,9 @@ SplitGap
 --------
 
 | **REQUIRED** 
-| **Input:** bam file
 | **Tools from command line:** samtools 
+| **Input:** bam file
+| **Output:** fastq file(s), "_1/_2" naming convention if paired end
 
 This step is particularly for Complete Genomics data. Complete Genomics uses a technique called `DNA Nanoball Sequencing <https://en.wikipedia.org/wiki/DNA_nanoball_sequencing>`_. 
 
@@ -60,9 +62,10 @@ Clipping
 --------
 
 | **REQUIRED**
-| **Input:** bam file
 | **Tools from command line:** samtools, bwa
 | **Tools from tools directory:** bam2fastq, seqtk
+| **Input:** bam file
+| **Output:** fastq file(s), "_1/_2" naming convention if paired end
 
 The clipping step takes in as input a bam file, either from the mitochondrial bam file extracted from the previous step, or as a starting point. First, it changes the bam file into a fastq format:
 
@@ -92,9 +95,10 @@ Remove NuMTs
 ------------
 
 | **REQUIRED**
-| **Input:** fastq file(s)
 | **Tools from command line:** samtools, bwa
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa), hg38 human genome without mitochondrial genome (hg38-norcrs.fa), and hg38 human genome (hg38.fa)
+| **Input:** fastq file(s) "_1/_2" naming convention if paired end
+| **Output:** bam file
 
 `NuMTs <https://en.wikipedia.org/wiki/NUMT>`_ are DNA sequences harbored in the nuclear genome, but closely resemble sequences in the mitochondrial genome. We remove these as quality control and to reduce noise in the following steps. The output of this step is a bam file with NuMTs removed
 
@@ -104,9 +108,10 @@ GATK
 ----
 
 | **REQUIRED** 
-| **Input:** bam file
 | **Tools from tools directory:** GenomeAnalysisTK.jar
 | **Reference genomes from genome directory:** hg38 mitochondrial reference genome (rCRS-MT.fa)
+| **Input:** bam file
+| **Output:** vcf file
 
 The gatk script were adapted from the suggested pipeline by GATK. In particular, the following steps are run in order:
 
@@ -136,8 +141,9 @@ SNPEFF
 ------
 
 | **REQUIRED**
-| **Input:** vcf file
 | **Tools from tools directory:** snpEff.jar
+| **Input:** vcf file
+| **Output:** vcf file
 
 This use's snpeff's most basic command and using the most recent mitochondrial reference genome GRCh38.86
 
@@ -151,8 +157,9 @@ ANNOVAR
 -------
 
 | **REQUIRED**
-| **Input:** vcf file
 | **Tools from tools directory:** Annovar's convert2annovar.pl, Annovar's table_annovar.pl
+| **Input:** vcf file
+| **Output:** vcf file
 
 Annovar can only be downloaded after registering on their `website <http://www.openbioinformatics.org/annovar/annovar_download_form.php>`_.
 
