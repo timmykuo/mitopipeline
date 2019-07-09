@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setup(
     name="mitopipeline",
-    version="1.1post2",
+    version="1.1post6",
     packages=['mitopipeline'],
     package_dir={'mitopipeline': 'mitopipeline'},
     py_modules=['mitopipeline'],
@@ -27,7 +27,7 @@ setup(
         [console_scripts]
         mitopipeline=mitopipeline.cmdline:run
     ''',
-    package_data={'mitopipeline': ['steps/*', 'steps/dbsnp/*', 'steps/tools/*', '/tools/*']},
+    package_data={'mitopipeline': ['steps/*', 'steps/dbsnp/*', 'steps/tools/*', '/tools/*', 'example/*']},
 
     #metadata
     author="Timothy Kuo",

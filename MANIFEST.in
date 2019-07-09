@@ -2,4 +2,4 @@ include README.rst
 include LICENSE.txt
 include mitopipeline/steps/*
 include mitopipeline/tools/*
-include example/*
+include mitopipeline/example/*

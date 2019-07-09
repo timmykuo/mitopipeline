@@ -15,6 +15,7 @@ START=$2
 TOOLS=$4
 filename=$1
 currdir=`pwd`
+FAILED="False"
 #last string following / delimeter will be name of the previous job
 #only set filetype if the value was a step in the pipeline
 filetype="_"$(awk -F/ '{print $NF}' <<< "$2" | awk '{print tolower($0)}')
@@ -36,11 +37,23 @@ then
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $3 $START/$1_1$filetype.fastq > $STOR/$1$2_1.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa aln $3 $START/$1_2$filetype.fastq > $STOR/$1$2_2.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa sampe $3 $STOR/$1$2_1.sai $STOR/$1$2_2.sai $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	fi
 else
 	echo SINGLE_END
@@ -48,10 +61,19 @@ else
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $3 $START/$1$filetype.fastq > $STOR/$1$2.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa samse $3 $STOR/$1$2.sai $START/$1$filetype.fastq > $STOR/$1$2.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	fi
 fi
 }
@@ -114,11 +136,23 @@ then
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $REF/hg38-nochr.fa $START/$1_1$filetype.fastq > $STOR/$1_1_hg38-nochr.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa aln $REF/hg38-nochr.fa $START/$1_2$filetype.fastq > $STOR/$1_2_hg38-nochr.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa sampe $REF/hg38-nochr.fa $STOR/$1_1_hg38-nochr.sai $STOR/$1_2_hg38-nochr.sai $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	fi 
 else
 	echo SINGLE-END
@@ -126,10 +160,19 @@ else
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	else
 	echo "Average read depth is $LENGTH. Using bwa-backtrack algorithm"
 	bwa aln $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_hg38-nochr.sai
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	bwa samse $REF/hg38-nochr.fa $STOR/$1_hg38-nochr.sai $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
+	if [ $? -ne 0 ]; then
+		FAILED="True"
+	fi
 	fi
 fi
 echo ****bwa alignment to hg38-norCRS DONE.
@@ -179,11 +222,23 @@ then
 	then
 		echo "average read_depth is $LENGTH. Using bwa-backtrack algorithm"
 		bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs_1.sai
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 		bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1_cl--rCRS-lowNUMTs_2.sai
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 		bwa sampe $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs_1.sai $STOR/$1_cl--rCRS-lowNUMTs_2.sai $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 	else
 		echo "average read_depth is $LENGTH. Using bwa-mem algorithm"
 		bwa mem -M -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq $STOR/$1_cl--rCRS-lowNUMTs_2.fastq > $STOR/$1.mito_hg38.sam
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 	fi
 else
 	echo "SINGLE-END"
@@ -191,10 +246,19 @@ else
 	then
 		echo "average read_depth is $LENGTH. Using bwa-backtrack algorithm"
 		bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs.sai
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 		bwa samse $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.sai $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1.mito_hg38.sam
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 	else
 		echo "average read_depth is $LENGTH. Using bwa-mem algorithm"
 		bwa mem -M -t 12 $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1.mito_hg38.sam
+		if [ $? -ne 0 ]; then
+			FAILED="True"
+		fi
 	fi
 fi
 echo ****bwa DONE.
@@ -206,10 +270,14 @@ echo .
 echo .
 
 echo ----samtools Started
-samtools view -bS ${STOR}/${1}.mito_hg38.sam > ${STOR}/${1}.mito_hg38.bam
-samtools sort ${STOR}/${1}.mito_hg38.bam > ${STOR}/${1}.mito_hg38.sorted.bam
-samtools index ${STOR}/${1}.mito_hg38.sorted.bam
-samtools view -b ${STOR}/${1}.mito_hg38.sorted.bam MT > ${NEW_BAMS}/${1}_removenumts.bam
+if [ "$FAILED" == "True" ]; then
+	echo "RemoveNuMTs failed – likely due to memory capacity. Please increase memory capacity or use the -l slurm option"
+else
+	samtools view -bS ${STOR}/${1}.mito_hg38.sam > ${STOR}/${1}.mito_hg38.bam
+	samtools sort ${STOR}/${1}.mito_hg38.bam > ${STOR}/${1}.mito_hg38.sorted.bam
+	samtools index ${STOR}/${1}.mito_hg38.sorted.bam
+	samtools view -b ${STOR}/${1}.mito_hg38.sorted.bam MT > ${NEW_BAMS}/${1}_removenumts.bam
+fi
 #mv $STOR/$1.mito_hg38.sorted.bam ${NEW_BAMS}/${1}_removenumts.bam
 echo ****samtools DONE.
 echo .
