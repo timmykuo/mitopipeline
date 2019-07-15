@@ -38,5 +38,3 @@ sleep 1m
 queue=$(squeue -u tyk3)
 inQueue=$(echo "$queue" | grep $batchId)
 done
-
-rm slurm-$batchId

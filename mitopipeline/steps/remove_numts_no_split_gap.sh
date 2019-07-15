@@ -33,7 +33,7 @@ function Align {
 if [ -e "$START/$1_1$filetype.fastq" ]
 then
 	echo PAIRED_END 
-	if (( $LENGTH > 70 ))
+	if [ $LENGTH -gt 70 ]
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $3 $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1$2.sam
@@ -57,7 +57,7 @@ then
 	fi
 else
 	echo SINGLE_END
-	if (( $LENGTH > 70 ))
+	if [ $LENGTH -gt 70 ]
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $3 $START/$1$filetype.fastq > $STOR/$1$2.sam
@@ -132,7 +132,7 @@ echo ----bwa alignment to hg38-norCRS --NUMTs: going to make $1_cl--nuclear.sam
 if [ -e "$START/$1_1$filetype.fastq" ]
 then
 	echo PAIRED-END
-	if (( $LENGTH > 70 ))
+	if [ $LENGTH -gt 70 ]
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1_1$filetype.fastq $START/$1_2$filetype.fastq > $STOR/$1_cl--nuclear.sam
@@ -156,7 +156,7 @@ then
 	fi 
 else
 	echo SINGLE-END
-	if (( $LENGTH > 70 ))
+	if [ $LENGTH -gt 70 ]
 	then
 	echo "Average read depth is $LENGTH. Using bwa-mem algorithm"
 	bwa mem -M -t 12 $REF/hg38-nochr.fa $START/$1$filetype.fastq > $STOR/$1_cl--nuclear.sam
@@ -218,7 +218,7 @@ echo ****bwa alignment of $1_cl--rCRS-lowNUMTs fastqs to hg38
 if [ -e "$STOR/$1_cl--rCRS-lowNUMTs_2.fastq" ]
 then
 	echo "PAIRED-END"
-	if (( $LENGTH < 70 ))
+	if [ $LENGTH -lt 70 ]
 	then
 		echo "average read_depth is $LENGTH. Using bwa-backtrack algorithm"
 		bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs_1.sai
@@ -242,7 +242,7 @@ then
 	fi
 else
 	echo "SINGLE-END"
-	if (( $LENGTH < 70 ))
+	if [ $LENGTH -lt 70 ]
 	then
 		echo "average read_depth is $LENGTH. Using bwa-backtrack algorithm"
 		bwa aln $REF/hg38.fa $STOR/$1_cl--rCRS-lowNUMTs.fastq > $STOR/$1_cl--rCRS-lowNUMTs.sai
