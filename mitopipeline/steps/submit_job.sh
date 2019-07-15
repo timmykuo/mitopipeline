@@ -29,7 +29,8 @@ sleep 1
 N=4
 batchId=`sbatch $3/$2_$1.slurm | awk -v N=$N '{print $N}'`
 
-queue=$(squeue -u tyk3)
+id=`echo "$9" | awk -F@ '{print $1}'`
+queue=$(squeue -u $id)
 inQueue=$(echo "$queue" | grep $batchId)
 #if the batchid is still within the squeue output
 while [ ! -z "$inQueue" ]
