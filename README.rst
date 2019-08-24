@@ -18,7 +18,7 @@ The steps shown in this figure are described further in the Pipeline Steps page.
 
 Credits
 ----------------
-The dependency management is controlled through a python package called `Luigi <https://github.com/spotify/luigi/>`_. In addition, many of the steps in the pipeline were adapted from scripts written by Sneha Grandhi. Check out her `Github  <https://github.com/sneha-grandhi/>`_, `LinkedIn <https://www.linkedin.com/in/sneha-grandhi-phd-0165aa58/>`_, or contact her through her  email: sneha_grandhi@hms.harvard.edu. In addition, Janet Wang helped with getting mitopipeline set up on the Case HPC Server. Check out her `LinkedIn <https://www.linkedin.com/in/sneha-grandhi-phd-0165aa58/>`_!
+The dependency management is controlled through a python package called `Luigi <https://github.com/spotify/luigi/>`_. In addition, many of the steps in the pipeline were adapted from scripts written by Sneha Grandhi. Check out her `Github  <https://github.com/sneha-grandhi/>`_, `LinkedIn <https://www.linkedin.com/in/sneha-grandhi-phd-0165aa58/>`_, or contact her through her  email: sneha_grandhi@hms.harvard.edu. In addition, Janet Wang helped with getting mitopipeline set up on the Case HPC Server. Check out her `LinkedIn <https://www.linkedin.com/in/janet-wang-526a31163/>`_!
 
 Table of Contents
 -----------------
